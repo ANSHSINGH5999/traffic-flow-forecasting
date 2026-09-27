@@ -1,0 +1,720 @@
+{
+  "experiment_id": "20260927_202736_final",
+  "mode": "final",
+  "timestamp": "2026-09-27T21:00:48.365200",
+  "random_seed": 42,
+  "device": "mps",
+  "python": "3.14.6",
+  "os": "Darwin 25.6.0 (arm64)",
+  "libraries": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0",
+    "matplotlib": "3.11.2",
+    "streamlit": "1.64.0",
+    "pyyaml": "6.0.3"
+  },
+  "config": {
+    "project": {
+      "name": "Enhanced Machine Learning Framework for Short-Term Traffic Flow Forecasting",
+      "random_seed": 42
+    },
+    "paths": {
+      "raw_data": "data/raw/pems04.npz",
+      "results_dir": "results",
+      "models_dir": "trained_models"
+    },
+    "dataset": {
+      "name": "PeMSD4",
+      "interval_minutes": 5,
+      "start_date": "2018-01-01",
+      "flow_feature_index": 0,
+      "steps_per_day": 288,
+      "start_weekday": 0
+    },
+    "forecast": {
+      "sequence_length": 12,
+      "horizon_steps": 3,
+      "horizon_minutes": 15
+    },
+    "split": {
+      "train": 0.7,
+      "validation": 0.15,
+      "test": 0.15
+    },
+    "preprocessing": {
+      "zero_is_missing": true,
+      "max_interpolation_gap": 12
+    },
+    "evaluation": {
+      "mape_min_flow": 10
+    },
+    "tuning": {
+      "max_sensors": 40,
+      "max_epochs": 8
+    },
+    "models": {
+      "random_forest": {
+        "fixed": {
+          "n_estimators": 100,
+          "max_samples": 0.1,
+          "n_jobs": -1
+        },
+        "search": {
+          "max_depth": [
+            10,
+            20
+          ],
+          "min_samples_leaf": [
+            1,
+            5
+          ]
+        }
+      },
+      "xgboost": {
+        "fixed": {
+          "n_estimators": 1000,
+          "subsample": 0.8,
+          "colsample_bytree": 0.8,
+          "tree_method": "hist",
+          "early_stopping_rounds": 30
+        },
+        "search": {
+          "max_depth": [
+            6,
+            8
+          ],
+          "learning_rate": [
+            0.05,
+            0.1
+          ]
+        }
+      },
+      "lstm": {
+        "fixed": {
+          "dropout": 0.2,
+          "learning_rate": 0.001,
+          "batch_size": 1024,
+          "max_epochs": 25,
+          "patience": 5
+        },
+        "search": {
+          "hidden_size": [
+            32,
+            64
+          ],
+          "num_layers": [
+            1,
+            2
+          ]
+        }
+      },
+      "gru": {
+        "fixed": {
+          "dropout": 0.2,
+          "learning_rate": 0.001,
+          "batch_size": 1024,
+          "max_epochs": 25,
+          "patience": 5
+        },
+        "search": {
+          "hidden_size": [
+            32,
+            64
+          ],
+          "num_layers": [
+            1,
+            2
+          ]
+        }
+      },
+      "hybrid": {
+        "xgboost_fixed": {
+          "n_estimators": 1000,
+          "subsample": 0.8,
+          "colsample_bytree": 0.8,
+          "tree_method": "hist",
+          "early_stopping_rounds": 30
+        },
+        "xgboost_search": {
+          "max_depth": [
+            6,
+            8
+          ],
+          "learning_rate": [
+            0.05,
+            0.1
+          ]
+        }
+      }
+    },
+    "debug": {
+      "max_sensors": 5,
+      "max_epochs": 3,
+      "results_dir": "results_debug",
+      "models_dir": "trained_models_debug"
+    }
+  },
+  "total_runtime_s": 1991.8722947499482,
+  "dataset": {
+    "sensors": 307,
+    "time_steps": 16992,
+    "missing_readings": 82935,
+    "missing_pct": 1.5898456909402086,
+    "interpolated_readings": 46960,
+    "unfilled_long_gap_readings": 35975,
+    "bounds": {
+      "train": [
+        0,
+        11894
+      ],
+      "val": [
+        11894,
+        14443
+      ],
+      "test": [
+        14443,
+        16992
+      ]
+    },
+    "samples": {
+      "train": 3569218,
+      "val": 763134,
+      "test": 765921
+    }
+  },
+  "model_parameters": {
+    "Historical Average": {
+      "method": "weekday x 5-min slot x sensor mean"
+    },
+    "Random Forest": {
+      "selected": {
+        "max_depth": 20,
+        "min_samples_leaf": 5
+      },
+      "search": [
+        {
+          "params": {
+            "max_depth": 10,
+            "min_samples_leaf": 1
+          },
+          "val_mae": 22.4259
+        },
+        {
+          "params": {
+            "max_depth": 10,
+            "min_samples_leaf": 5
+          },
+          "val_mae": 22.3504
+        },
+        {
+          "params": {
+            "max_depth": 20,
+            "min_samples_leaf": 1
+          },
+          "val_mae": 21.9226
+        },
+        {
+          "params": {
+            "max_depth": 20,
+            "min_samples_leaf": 5
+          },
+          "val_mae": 21.8972
+        }
+      ],
+      "tuning_time_s": 41.54213650000747
+    },
+    "XGBoost": {
+      "selected": {
+        "max_depth": 8,
+        "learning_rate": 0.05,
+        "best_iteration": 936
+      },
+      "search": [
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.4414
+        },
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.4627
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.3355
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.3965
+        }
+      ],
+      "tuning_time_s": 24.8510420829989
+    },
+    "LSTM": {
+      "selected": {
+        "hidden_size": 32,
+        "num_layers": 2
+      },
+      "architecture": {
+        "hidden_size": 32,
+        "num_layers": 2,
+        "dropout": 0.2
+      },
+      "training": {
+        "dropout": 0.2,
+        "learning_rate": 0.001,
+        "batch_size": 1024,
+        "max_epochs": 25,
+        "patience": 5
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_mse_scaled": 0.05805149510380064,
+          "val_mae": 22.028608322143555
+        },
+        {
+          "epoch": 2,
+          "train_mse_scaled": 0.047945752150306845,
+          "val_mae": 22.093263626098633
+        },
+        {
+          "epoch": 3,
+          "train_mse_scaled": 0.047224190193035316,
+          "val_mae": 21.994726181030273
+        },
+        {
+          "epoch": 4,
+          "train_mse_scaled": 0.04663734698010669,
+          "val_mae": 21.532243728637695
+        },
+        {
+          "epoch": 5,
+          "train_mse_scaled": 0.04645421274740311,
+          "val_mae": 21.513896942138672
+        },
+        {
+          "epoch": 6,
+          "train_mse_scaled": 0.04629153431671547,
+          "val_mae": 21.472209930419922
+        },
+        {
+          "epoch": 7,
+          "train_mse_scaled": 0.04621820223153615,
+          "val_mae": 21.390316009521484
+        },
+        {
+          "epoch": 8,
+          "train_mse_scaled": 0.04613124530171511,
+          "val_mae": 21.443086624145508
+        },
+        {
+          "epoch": 9,
+          "train_mse_scaled": 0.0460824826411911,
+          "val_mae": 21.445545196533203
+        },
+        {
+          "epoch": 10,
+          "train_mse_scaled": 0.04601470353893566,
+          "val_mae": 21.346433639526367
+        },
+        {
+          "epoch": 11,
+          "train_mse_scaled": 0.04594784040867092,
+          "val_mae": 21.338102340698242
+        },
+        {
+          "epoch": 12,
+          "train_mse_scaled": 0.045890795528581815,
+          "val_mae": 21.50965118408203
+        },
+        {
+          "epoch": 13,
+          "train_mse_scaled": 0.04584279942826943,
+          "val_mae": 21.34354591369629
+        },
+        {
+          "epoch": 14,
+          "train_mse_scaled": 0.045808459060957,
+          "val_mae": 21.324983596801758
+        },
+        {
+          "epoch": 15,
+          "train_mse_scaled": 0.04573981394696878,
+          "val_mae": 21.294166564941406
+        },
+        {
+          "epoch": 16,
+          "train_mse_scaled": 0.04572127898310149,
+          "val_mae": 21.37630844116211
+        },
+        {
+          "epoch": 17,
+          "train_mse_scaled": 0.04568644274080051,
+          "val_mae": 21.31268882751465
+        },
+        {
+          "epoch": 18,
+          "train_mse_scaled": 0.045645150935595784,
+          "val_mae": 21.31158447265625
+        },
+        {
+          "epoch": 19,
+          "train_mse_scaled": 0.04561421292553445,
+          "val_mae": 21.35667610168457
+        },
+        {
+          "epoch": 20,
+          "train_mse_scaled": 0.04559484521055119,
+          "val_mae": 21.3858699798584
+        }
+      ],
+      "search": [
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 1
+          },
+          "val_mae": 23.6695
+        },
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 2
+          },
+          "val_mae": 23.6467
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 1
+          },
+          "val_mae": 23.71
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 2
+          },
+          "val_mae": 23.6646
+        }
+      ],
+      "tuning_time_s": 112.76007070892956,
+      "parameters": 12961
+    },
+    "GRU": {
+      "selected": {
+        "hidden_size": 64,
+        "num_layers": 2
+      },
+      "architecture": {
+        "hidden_size": 64,
+        "num_layers": 2,
+        "dropout": 0.2
+      },
+      "training": {
+        "dropout": 0.2,
+        "learning_rate": 0.001,
+        "batch_size": 1024,
+        "max_epochs": 25,
+        "patience": 5
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_mse_scaled": 0.051883054579765574,
+          "val_mae": 21.992645263671875
+        },
+        {
+          "epoch": 2,
+          "train_mse_scaled": 0.04659720941709549,
+          "val_mae": 21.77806854248047
+        },
+        {
+          "epoch": 3,
+          "train_mse_scaled": 0.04630066341621623,
+          "val_mae": 21.532127380371094
+        },
+        {
+          "epoch": 4,
+          "train_mse_scaled": 0.04609909895580838,
+          "val_mae": 21.413902282714844
+        },
+        {
+          "epoch": 5,
+          "train_mse_scaled": 0.04603356810716322,
+          "val_mae": 21.434938430786133
+        },
+        {
+          "epoch": 6,
+          "train_mse_scaled": 0.04590854519570823,
+          "val_mae": 21.4674129486084
+        },
+        {
+          "epoch": 7,
+          "train_mse_scaled": 0.0458402291690804,
+          "val_mae": 21.351409912109375
+        },
+        {
+          "epoch": 8,
+          "train_mse_scaled": 0.04575791824068004,
+          "val_mae": 21.370864868164062
+        },
+        {
+          "epoch": 9,
+          "train_mse_scaled": 0.04570933330391927,
+          "val_mae": 21.429227828979492
+        },
+        {
+          "epoch": 10,
+          "train_mse_scaled": 0.04562244801180209,
+          "val_mae": 21.29364776611328
+        },
+        {
+          "epoch": 11,
+          "train_mse_scaled": 0.04556625851316871,
+          "val_mae": 21.41851806640625
+        },
+        {
+          "epoch": 12,
+          "train_mse_scaled": 0.04550511134195174,
+          "val_mae": 21.60381317138672
+        },
+        {
+          "epoch": 13,
+          "train_mse_scaled": 0.04549339901638422,
+          "val_mae": 21.24648094177246
+        },
+        {
+          "epoch": 14,
+          "train_mse_scaled": 0.04545049093883848,
+          "val_mae": 21.323108673095703
+        },
+        {
+          "epoch": 15,
+          "train_mse_scaled": 0.04539122055137015,
+          "val_mae": 21.29071807861328
+        },
+        {
+          "epoch": 16,
+          "train_mse_scaled": 0.045383264399466126,
+          "val_mae": 21.46529197692871
+        },
+        {
+          "epoch": 17,
+          "train_mse_scaled": 0.04535166958568662,
+          "val_mae": 21.31599235534668
+        },
+        {
+          "epoch": 18,
+          "train_mse_scaled": 0.0453180022390931,
+          "val_mae": 21.283023834228516
+        }
+      ],
+      "search": [
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 1
+          },
+          "val_mae": 23.6262
+        },
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 2
+          },
+          "val_mae": 23.6051
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 1
+          },
+          "val_mae": 23.6136
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 2
+          },
+          "val_mae": 23.422
+        }
+      ],
+      "tuning_time_s": 125.13755995791871,
+      "parameters": 37889
+    },
+    "Hybrid LSTM-XGBoost": {
+      "selected": {
+        "max_depth": 8,
+        "learning_rate": 0.05,
+        "best_iteration": 721
+      },
+      "search": [
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.3427
+        },
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.388
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.2326
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.2506
+        }
+      ],
+      "tuning_time_s": 33.81939625006635,
+      "time_breakdown_s": {
+        "lstm_training": 517.8359319579322,
+        "feature_extraction": 9.8328934579622,
+        "xgboost_training": 122.926527124946
+      },
+      "fused_feature_count": 51
+    }
+  },
+  "training_time_s": {
+    "Historical Average": 0.06782804196700454,
+    "Random Forest": 131.25436854106374,
+    "XGBoost": 67.07910083292518,
+    "LSTM": 517.8359319579322,
+    "GRU": 760.0495262499899,
+    "Hybrid LSTM-XGBoost": 650.5953525408404
+  },
+  "validation_metrics": [
+    {
+      "Model": "Historical Average",
+      "MAE": 25.850391387939453,
+      "RMSE": 41.163875579833984,
+      "MAPE": 14.248682500847432
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 19.652829999697357,
+      "RMSE": 31.299922898530962,
+      "MAPE": 11.196909599291077
+    },
+    {
+      "Model": "XGBoost",
+      "MAE": 19.332805633544922,
+      "RMSE": 30.747421264648438,
+      "MAPE": 11.1211537310365
+    },
+    {
+      "Model": "LSTM",
+      "MAE": 21.294166564941406,
+      "RMSE": 32.85271072387695,
+      "MAPE": 12.524244702026996
+    },
+    {
+      "Model": "GRU",
+      "MAE": 21.24648094177246,
+      "RMSE": 32.850059509277344,
+      "MAPE": 12.394074267249891
+    },
+    {
+      "Model": "Hybrid LSTM-XGBoost",
+      "MAE": 19.25518035888672,
+      "RMSE": 30.619251251220703,
+      "MAPE": 11.079664559086162
+    }
+  ],
+  "test_metrics": [
+    {
+      "Model": "Historical Average",
+      "MAE": 24.469192504882812,
+      "RMSE": 39.67498779296875,
+      "MAPE": 13.583332030446229,
+      "Training time (s)": 0.06782804196700454,
+      "Inference time (s)": 0.01155349996406585,
+      "Inference per sample (ms)": 1.5084453832791958e-05,
+      "Parameters": "",
+      "Model size (MB)": 2.475927
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 20.349281311035156,
+      "RMSE": 32.43757247924805,
+      "MAPE": 11.260314042109048,
+      "Training time (s)": 131.25436854106374,
+      "Inference time (s)": 1.958936709095724,
+      "Inference per sample (ms)": 0.0025576224037410175,
+      "Parameters": "",
+      "Model size (MB)": 99.811065
+    },
+    {
+      "Model": "XGBoost",
+      "MAE": 19.978879928588867,
+      "RMSE": 31.844064712524414,
+      "MAPE": 11.182796122084488,
+      "Training time (s)": 67.07910083292518,
+      "Inference time (s)": 1.8052304580342025,
+      "Inference per sample (ms)": 0.0023569408046446075,
+      "Parameters": "",
+      "Model size (MB)": 22.949738
+    },
+    {
+      "Model": "LSTM",
+      "MAE": 22.097312927246094,
+      "RMSE": 34.1156120300293,
+      "MAPE": 12.58685913278758,
+      "Training time (s)": 517.8359319579322,
+      "Inference time (s)": 1.1666619579773396,
+      "Inference per sample (ms)": 0.0015232144803149928,
+      "Parameters": 12961,
+      "Model size (MB)": 0.057772
+    },
+    {
+      "Model": "GRU",
+      "MAE": 22.03031349182129,
+      "RMSE": 34.084171295166016,
+      "MAPE": 12.46198333257111,
+      "Training time (s)": 760.0495262499899,
+      "Inference time (s)": 3.093080124934204,
+      "Inference per sample (ms)": 0.004038380100472769,
+      "Parameters": 37889,
+      "Model size (MB)": 0.15725
+    },
+    {
+      "Model": "Hybrid LSTM-XGBoost",
+      "MAE": 19.89403533935547,
+      "RMSE": 31.712459564208984,
+      "MAPE": 11.134201570614376,
+      "Training time (s)": 650.5953525408404,
+      "Inference time (s)": 3.0669624579604715,
+      "Inference per sample (ms)": 0.004004280412680253,
+      "Parameters": "",
+      "Model size (MB)": 16.873921
+    }
+  ]
+}

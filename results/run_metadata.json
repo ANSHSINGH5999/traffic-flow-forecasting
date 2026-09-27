@@ -1,0 +1,161 @@
+{
+  "experiment_id": "20260927_202736_final",
+  "mode": "final",
+  "timestamp": "2026-09-27T21:00:48.365200",
+  "random_seed": 42,
+  "device": "mps",
+  "python": "3.14.6",
+  "os": "Darwin 25.6.0 (arm64)",
+  "libraries": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0",
+    "matplotlib": "3.11.2",
+    "streamlit": "1.64.0",
+    "pyyaml": "6.0.3"
+  },
+  "config": {
+    "project": {
+      "name": "Enhanced Machine Learning Framework for Short-Term Traffic Flow Forecasting",
+      "random_seed": 42
+    },
+    "paths": {
+      "raw_data": "data/raw/pems04.npz",
+      "results_dir": "results",
+      "models_dir": "trained_models"
+    },
+    "dataset": {
+      "name": "PeMSD4",
+      "interval_minutes": 5,
+      "start_date": "2018-01-01",
+      "flow_feature_index": 0,
+      "steps_per_day": 288,
+      "start_weekday": 0
+    },
+    "forecast": {
+      "sequence_length": 12,
+      "horizon_steps": 3,
+      "horizon_minutes": 15
+    },
+    "split": {
+      "train": 0.7,
+      "validation": 0.15,
+      "test": 0.15
+    },
+    "preprocessing": {
+      "zero_is_missing": true,
+      "max_interpolation_gap": 12
+    },
+    "evaluation": {
+      "mape_min_flow": 10
+    },
+    "tuning": {
+      "max_sensors": 40,
+      "max_epochs": 8
+    },
+    "models": {
+      "random_forest": {
+        "fixed": {
+          "n_estimators": 100,
+          "max_samples": 0.1,
+          "n_jobs": -1
+        },
+        "search": {
+          "max_depth": [
+            10,
+            20
+          ],
+          "min_samples_leaf": [
+            1,
+            5
+          ]
+        }
+      },
+      "xgboost": {
+        "fixed": {
+          "n_estimators": 1000,
+          "subsample": 0.8,
+          "colsample_bytree": 0.8,
+          "tree_method": "hist",
+          "early_stopping_rounds": 30
+        },
+        "search": {
+          "max_depth": [
+            6,
+            8
+          ],
+          "learning_rate": [
+            0.05,
+            0.1
+          ]
+        }
+      },
+      "lstm": {
+        "fixed": {
+          "dropout": 0.2,
+          "learning_rate": 0.001,
+          "batch_size": 1024,
+          "max_epochs": 25,
+          "patience": 5
+        },
+        "search": {
+          "hidden_size": [
+            32,
+            64
+          ],
+          "num_layers": [
+            1,
+            2
+          ]
+        }
+      },
+      "gru": {
+        "fixed": {
+          "dropout": 0.2,
+          "learning_rate": 0.001,
+          "batch_size": 1024,
+          "max_epochs": 25,
+          "patience": 5
+        },
+        "search": {
+          "hidden_size": [
+            32,
+            64
+          ],
+          "num_layers": [
+            1,
+            2
+          ]
+        }
+      },
+      "hybrid": {
+        "xgboost_fixed": {
+          "n_estimators": 1000,
+          "subsample": 0.8,
+          "colsample_bytree": 0.8,
+          "tree_method": "hist",
+          "early_stopping_rounds": 30
+        },
+        "xgboost_search": {
+          "max_depth": [
+            6,
+            8
+          ],
+          "learning_rate": [
+            0.05,
+            0.1
+          ]
+        }
+      }
+    },
+    "debug": {
+      "max_sensors": 5,
+      "max_epochs": 3,
+      "results_dir": "results_debug",
+      "models_dir": "trained_models_debug"
+    }
+  },
+  "total_runtime_s": 1991.8722947499482
+}

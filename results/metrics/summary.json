@@ -1,0 +1,53 @@
+{
+  "experiment_id": "20260927_202736_final",
+  "mode": "final",
+  "best_model_by_rmse": "Hybrid LSTM-XGBoost",
+  "best_model_by_mae": "Hybrid LSTM-XGBoost",
+  "test_metrics": [
+    {
+      "Model": "Historical Average",
+      "MAE": 24.469192504882812,
+      "RMSE": 39.67498779296875,
+      "MAPE": 13.583332030446227
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 20.349281311035156,
+      "RMSE": 32.43757247924805,
+      "MAPE": 11.260314042109048
+    },
+    {
+      "Model": "XGBoost",
+      "MAE": 19.978879928588867,
+      "RMSE": 31.844064712524418,
+      "MAPE": 11.182796122084488
+    },
+    {
+      "Model": "LSTM",
+      "MAE": 22.097312927246097,
+      "RMSE": 34.1156120300293,
+      "MAPE": 12.58685913278758
+    },
+    {
+      "Model": "GRU",
+      "MAE": 22.03031349182129,
+      "RMSE": 34.084171295166016,
+      "MAPE": 12.46198333257111
+    },
+    {
+      "Model": "Hybrid LSTM-XGBoost",
+      "MAE": 19.89403533935547,
+      "RMSE": 31.712459564208984,
+      "MAPE": 11.134201570614376
+    }
+  ],
+  "research_answer": [
+    "Under this experimental setup the test RMSE ranking was: Hybrid LSTM-XGBoost (31.712), XGBoost (31.844), Random Forest (32.438), GRU (34.084), LSTM (34.116), Historical Average (39.675).",
+    "All learning models are compared with the Historical Average baseline (MAE 24.469). The measured MAE reduction relative to the baseline ranged from 9.69% to 18.70%.",
+    "The tree models, which receive engineered features including time of day and weekday, measured MAE 20.349 (RF) and 19.979 (XGBoost). The sequence-only recurrent models measured 22.097 (LSTM) and 22.030 (GRU).",
+    "Hybrid LSTM-XGBoost vs the strongest single model (XGBoost): MAE +0.42%, RMSE +0.41%, MAPE +0.43% (positive = hybrid lower error): lower error on all three metrics. It came at 9.7x the training time and 1.7x the inference time.",
+    "Inside the hybrid, LSTM-derived features account for 73.1% of the XGBoost gain (the engineered features account for the rest). This measures how much the model uses them, not causality.",
+    "Error analysis: all six models had their highest flow-regime MAE in the 'peak' regime; for every model the sudden-change MAE exceeded its worst flow-regime MAE.",
+    "Lowest MAE per regime: low: Random Forest (7.27); normal: Hybrid LSTM-XGBoost (18.33); high: Hybrid LSTM-XGBoost (28.69); peak: Hybrid LSTM-XGBoost (38.28); sudden_change: Historical Average (63.06)."
+  ]
+}

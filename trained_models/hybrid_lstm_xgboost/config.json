@@ -1,0 +1,14 @@
+{
+  "cell": "lstm",
+  "architecture": {
+    "hidden_size": 32,
+    "num_layers": 2,
+    "dropout": 0.2
+  },
+  "lstm_representation": "final hidden state of the last LSTM layer",
+  "xgboost": {
+    "max_depth": 8,
+    "learning_rate": 0.05,
+    "best_iteration": 721
+  }
+}

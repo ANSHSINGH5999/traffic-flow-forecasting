@@ -1,0 +1,108 @@
+{
+  "cell": "gru",
+  "architecture": {
+    "hidden_size": 64,
+    "num_layers": 2,
+    "dropout": 0.2
+  },
+  "training": {
+    "dropout": 0.2,
+    "learning_rate": 0.001,
+    "batch_size": 1024,
+    "max_epochs": 25,
+    "patience": 5
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_mse_scaled": 0.051883054579765574,
+      "val_mae": 21.992645263671875
+    },
+    {
+      "epoch": 2,
+      "train_mse_scaled": 0.04659720941709549,
+      "val_mae": 21.77806854248047
+    },
+    {
+      "epoch": 3,
+      "train_mse_scaled": 0.04630066341621623,
+      "val_mae": 21.532127380371094
+    },
+    {
+      "epoch": 4,
+      "train_mse_scaled": 0.04609909895580838,
+      "val_mae": 21.413902282714844
+    },
+    {
+      "epoch": 5,
+      "train_mse_scaled": 0.04603356810716322,
+      "val_mae": 21.434938430786133
+    },
+    {
+      "epoch": 6,
+      "train_mse_scaled": 0.04590854519570823,
+      "val_mae": 21.4674129486084
+    },
+    {
+      "epoch": 7,
+      "train_mse_scaled": 0.0458402291690804,
+      "val_mae": 21.351409912109375
+    },
+    {
+      "epoch": 8,
+      "train_mse_scaled": 0.04575791824068004,
+      "val_mae": 21.370864868164062
+    },
+    {
+      "epoch": 9,
+      "train_mse_scaled": 0.04570933330391927,
+      "val_mae": 21.429227828979492
+    },
+    {
+      "epoch": 10,
+      "train_mse_scaled": 0.04562244801180209,
+      "val_mae": 21.29364776611328
+    },
+    {
+      "epoch": 11,
+      "train_mse_scaled": 0.04556625851316871,
+      "val_mae": 21.41851806640625
+    },
+    {
+      "epoch": 12,
+      "train_mse_scaled": 0.04550511134195174,
+      "val_mae": 21.60381317138672
+    },
+    {
+      "epoch": 13,
+      "train_mse_scaled": 0.04549339901638422,
+      "val_mae": 21.24648094177246
+    },
+    {
+      "epoch": 14,
+      "train_mse_scaled": 0.04545049093883848,
+      "val_mae": 21.323108673095703
+    },
+    {
+      "epoch": 15,
+      "train_mse_scaled": 0.04539122055137015,
+      "val_mae": 21.29071807861328
+    },
+    {
+      "epoch": 16,
+      "train_mse_scaled": 0.045383264399466126,
+      "val_mae": 21.46529197692871
+    },
+    {
+      "epoch": 17,
+      "train_mse_scaled": 0.04535166958568662,
+      "val_mae": 21.31599235534668
+    },
+    {
+      "epoch": 18,
+      "train_mse_scaled": 0.0453180022390931,
+      "val_mae": 21.283023834228516
+    }
+  ],
+  "parameters": 37889
+}

@@ -1,0 +1,95 @@
+20:27:36  ===== FINAL EXPERIMENT  id=20260927_202736_final =====
+20:27:36  [1] Validating dataset
+20:27:36      shape [16992, 307, 3], zero readings 1.59%
+20:27:36  [2] Preprocessing
+20:27:37  [3] Split, windowing, features
+20:27:38      samples {'train': 3569218, 'val': 763134, 'test': 765921}  missing 1.59%  device mps
+20:27:38  [4] Historical Average
+20:27:38  [5] Random Forest (search on validation)
+20:27:46      RF candidate {'max_depth': 10, 'min_samples_leaf': 1}  val MAE 22.426
+20:27:55      RF candidate {'max_depth': 10, 'min_samples_leaf': 5}  val MAE 22.350
+20:28:08      RF candidate {'max_depth': 20, 'min_samples_leaf': 1}  val MAE 21.923
+20:28:19      RF candidate {'max_depth': 20, 'min_samples_leaf': 5}  val MAE 21.897
+20:30:36  [6] XGBoost (search on validation)
+20:30:48      XGB candidate {'max_depth': 6, 'learning_rate': 0.05}  val MAE 21.441
+20:30:53      XGB candidate {'max_depth': 6, 'learning_rate': 0.1}  val MAE 21.463
+20:30:57      XGB candidate {'max_depth': 8, 'learning_rate': 0.05}  val MAE 21.336
+20:31:01      XGB candidate {'max_depth': 8, 'learning_rate': 0.1}  val MAE 21.396
+20:32:08  [7] LSTM (search on validation, then early stopping)
+20:32:30      LSTM candidate {'hidden_size': 32, 'num_layers': 1}  val MAE 23.669
+20:32:54      LSTM candidate {'hidden_size': 32, 'num_layers': 2}  val MAE 23.647
+20:33:27      LSTM candidate {'hidden_size': 64, 'num_layers': 1}  val MAE 23.710
+20:34:01      LSTM candidate {'hidden_size': 64, 'num_layers': 2}  val MAE 23.665
+20:34:25        LSTM epoch  1  train MSE 0.0581  val MAE 22.029
+20:34:49        LSTM epoch  2  train MSE 0.0479  val MAE 22.093
+20:35:14        LSTM epoch  3  train MSE 0.0472  val MAE 21.995
+20:35:40        LSTM epoch  4  train MSE 0.0466  val MAE 21.532
+20:36:04        LSTM epoch  5  train MSE 0.0465  val MAE 21.514
+20:36:30        LSTM epoch  6  train MSE 0.0463  val MAE 21.472
+20:36:55        LSTM epoch  7  train MSE 0.0462  val MAE 21.390
+20:37:21        LSTM epoch  8  train MSE 0.0461  val MAE 21.443
+20:37:46        LSTM epoch  9  train MSE 0.0461  val MAE 21.446
+20:38:12        LSTM epoch 10  train MSE 0.0460  val MAE 21.346
+20:38:38        LSTM epoch 11  train MSE 0.0459  val MAE 21.338
+20:39:03        LSTM epoch 12  train MSE 0.0459  val MAE 21.510
+20:39:28        LSTM epoch 13  train MSE 0.0458  val MAE 21.344
+20:39:54        LSTM epoch 14  train MSE 0.0458  val MAE 21.325
+20:40:19        LSTM epoch 15  train MSE 0.0457  val MAE 21.294
+20:40:48        LSTM epoch 16  train MSE 0.0457  val MAE 21.376
+20:41:14        LSTM epoch 17  train MSE 0.0457  val MAE 21.313
+20:41:45        LSTM epoch 18  train MSE 0.0456  val MAE 21.312
+20:42:12        LSTM epoch 19  train MSE 0.0456  val MAE 21.357
+20:42:39        LSTM epoch 20  train MSE 0.0456  val MAE 21.386
+20:42:39  [8] GRU (search on validation, then early stopping)
+20:43:03      GRU candidate {'hidden_size': 32, 'num_layers': 1}  val MAE 23.626
+20:43:37      GRU candidate {'hidden_size': 32, 'num_layers': 2}  val MAE 23.605
+20:44:08      GRU candidate {'hidden_size': 64, 'num_layers': 1}  val MAE 23.614
+20:44:44      GRU candidate {'hidden_size': 64, 'num_layers': 2}  val MAE 23.422
+20:45:21        GRU epoch  1  train MSE 0.0519  val MAE 21.993
+20:45:56        GRU epoch  2  train MSE 0.0466  val MAE 21.778
+20:46:32        GRU epoch  3  train MSE 0.0463  val MAE 21.532
+20:47:08        GRU epoch  4  train MSE 0.0461  val MAE 21.414
+20:47:47        GRU epoch  5  train MSE 0.0460  val MAE 21.435
+20:48:25        GRU epoch  6  train MSE 0.0459  val MAE 21.467
+20:49:16        GRU epoch  7  train MSE 0.0458  val MAE 21.351
+20:50:00        GRU epoch  8  train MSE 0.0458  val MAE 21.371
+20:50:41        GRU epoch  9  train MSE 0.0457  val MAE 21.429
+20:51:24        GRU epoch 10  train MSE 0.0456  val MAE 21.294
+20:52:06        GRU epoch 11  train MSE 0.0456  val MAE 21.419
+20:52:49        GRU epoch 12  train MSE 0.0455  val MAE 21.604
+20:53:35        GRU epoch 13  train MSE 0.0455  val MAE 21.246
+20:54:23        GRU epoch 14  train MSE 0.0455  val MAE 21.323
+20:55:12        GRU epoch 15  train MSE 0.0454  val MAE 21.291
+20:55:57        GRU epoch 16  train MSE 0.0454  val MAE 21.465
+20:56:41        GRU epoch 17  train MSE 0.0454  val MAE 21.316
+20:57:24        GRU epoch 18  train MSE 0.0453  val MAE 21.283
+20:57:24  [9] Hybrid LSTM-XGBoost (frozen LSTM features + engineered features -> XGBoost)
+20:57:45      Hybrid XGB candidate {'max_depth': 6, 'learning_rate': 0.05}  val MAE 21.343
+20:57:52      Hybrid XGB candidate {'max_depth': 6, 'learning_rate': 0.1}  val MAE 21.388
+20:58:02      Hybrid XGB candidate {'max_depth': 8, 'learning_rate': 0.05}  val MAE 21.233
+20:58:08      Hybrid XGB candidate {'max_depth': 8, 'learning_rate': 0.1}  val MAE 21.251
+21:00:11  [10] Evaluating on validation and the locked test set
+21:00:11      Historical Average   MAE 24.469  RMSE 39.675  MAPE 13.583%  train 0.1s  infer 0.01s
+21:00:17      Random Forest        MAE 20.349  RMSE 32.438  MAPE 11.260%  train 131.3s  infer 1.96s
+21:00:23      XGBoost              MAE 19.979  RMSE 31.844  MAPE 11.183%  train 67.1s  infer 1.81s
+21:00:28      LSTM                 MAE 22.097  RMSE 34.116  MAPE 12.587%  train 517.8s  infer 1.17s
+21:00:35      GRU                  MAE 22.030  RMSE 34.084  MAPE 12.462%  train 760.0s  infer 3.09s
+21:00:44      Hybrid LSTM-XGBoost  MAE 19.894  RMSE 31.712  MAPE 11.134%  train 650.6s  infer 3.07s
+21:00:46  [11] Error analysis and feature importance
+21:00:47  [12] Figures
+21:00:48  [13] Reports
+21:00:48  
+              Model    MAE   RMSE   MAPE  Training time (s)  Inference time (s)
+ Historical Average 24.469 39.675 13.583              0.068               0.012
+      Random Forest 20.349 32.438 11.260            131.254               1.959
+            XGBoost 19.979 31.844 11.183             67.079               1.805
+               LSTM 22.097 34.116 12.587            517.836               1.167
+                GRU 22.030 34.084 12.462            760.050               3.093
+Hybrid LSTM-XGBoost 19.894 31.712 11.134            650.595               3.067
+21:00:48    * Lowest test RMSE: Hybrid LSTM-XGBoost (31.712). Lowest MAE: Hybrid LSTM-XGBoost (19.894). Lowest MAPE: Hybrid LSTM-XGBoost (11.134%).
+21:00:48    * Versus the Historical Average baseline (MAE 24.469), the best model reduces MAE by 18.70%.
+21:00:48    * Hybrid LSTM-XGBoost vs the strongest single model (XGBoost): MAE +0.42%, RMSE +0.41%, MAPE +0.43% (positive = hybrid lower error). The hybrid improves on XGBoost in RMSE.
+21:00:48    * LSTM vs GRU: RMSE 34.116 vs 34.084; training time 517.8s vs 760.0s.
+21:00:48    * Random Forest vs XGBoost (identical features): RMSE 32.438 vs 31.844.
+21:00:48    * Cost: hybrid training 650.6s and inference 3.07s, vs 67.1s / 1.81s for XGBoost.
+21:00:48  Done in 33.2 min. Reports: /Users/kma/Desktop/ML/traffic-forecasting/results/reports

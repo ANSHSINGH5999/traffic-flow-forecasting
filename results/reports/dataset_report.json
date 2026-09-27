@@ -1,0 +1,40 @@
+{
+  "file": "data/raw/pems04.npz",
+  "file_size_mb": 32.96,
+  "array_shape": [
+    16992,
+    307,
+    3
+  ],
+  "dtype": "float64",
+  "channels": "flow, occupancy, speed (flow used as target)",
+  "time_steps": 16992,
+  "sensors": 307,
+  "sampling_interval_minutes": 5,
+  "interval_check": "16992 steps / 288 steps per day = 59.00 days (2018-01-01 onward); a whole number of days, consistent with the documented 5-minute interval",
+  "flow_stats": {
+    "min": 0.0,
+    "max": 919.0,
+    "mean": 211.7007794815878,
+    "median": 180.0,
+    "std": 158.0684326485243
+  },
+  "nan_count": 0,
+  "inf_count": 0,
+  "negative_count": 0,
+  "zero_count": 82935,
+  "zero_pct": 1.5898456909402086,
+  "missing_values_note": "No NaNs are stored; failed readings appear as 0 flow and are treated as missing.",
+  "non_integer_flow_count": 0,
+  "identical_consecutive_rows": 0,
+  "temporal_ordering": "Rows are consecutive 5-minute steps in index order (no timestamp column in the file).",
+  "sensor_consistency": {
+    "all_sensors_same_length": true,
+    "sensors_always_zero": 0,
+    "sensors_constant": 0,
+    "sensors_with_any_zero": 169,
+    "worst_sensor_zero_pct": 38.08262711864407,
+    "longest_zero_run_steps": 408
+  },
+  "checks_passed": true
+}

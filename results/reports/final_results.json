@@ -1,0 +1,971 @@
+{
+  "experiment_id": "20260927_202736_final",
+  "mode": "final",
+  "best_model_by_rmse": "Hybrid LSTM-XGBoost",
+  "best_model_by_mae": "Hybrid LSTM-XGBoost",
+  "test_metrics": [
+    {
+      "Model": "Historical Average",
+      "MAE": 24.469192504882812,
+      "RMSE": 39.67498779296875,
+      "MAPE": 13.583332030446227
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 20.349281311035156,
+      "RMSE": 32.43757247924805,
+      "MAPE": 11.260314042109048
+    },
+    {
+      "Model": "XGBoost",
+      "MAE": 19.978879928588867,
+      "RMSE": 31.844064712524418,
+      "MAPE": 11.182796122084488
+    },
+    {
+      "Model": "LSTM",
+      "MAE": 22.097312927246097,
+      "RMSE": 34.1156120300293,
+      "MAPE": 12.58685913278758
+    },
+    {
+      "Model": "GRU",
+      "MAE": 22.03031349182129,
+      "RMSE": 34.084171295166016,
+      "MAPE": 12.46198333257111
+    },
+    {
+      "Model": "Hybrid LSTM-XGBoost",
+      "MAE": 19.89403533935547,
+      "RMSE": 31.712459564208984,
+      "MAPE": 11.134201570614376
+    }
+  ],
+  "research_answer": [
+    "Under this experimental setup the test RMSE ranking was: Hybrid LSTM-XGBoost (31.712), XGBoost (31.844), Random Forest (32.438), GRU (34.084), LSTM (34.116), Historical Average (39.675).",
+    "All learning models are compared with the Historical Average baseline (MAE 24.469). The measured MAE reduction relative to the baseline ranged from 9.69% to 18.70%.",
+    "The tree models, which receive engineered features including time of day and weekday, measured MAE 20.349 (RF) and 19.979 (XGBoost). The sequence-only recurrent models measured 22.097 (LSTM) and 22.030 (GRU).",
+    "Hybrid LSTM-XGBoost vs the strongest single model (XGBoost): MAE +0.42%, RMSE +0.41%, MAPE +0.43% (positive = hybrid lower error): lower error on all three metrics. It came at 9.7x the training time and 1.7x the inference time.",
+    "Inside the hybrid, LSTM-derived features account for 73.1% of the XGBoost gain (the engineered features account for the rest). This measures how much the model uses them, not causality.",
+    "Error analysis: all six models had their highest flow-regime MAE in the 'peak' regime; for every model the sudden-change MAE exceeded its worst flow-regime MAE.",
+    "Lowest MAE per regime: low: Random Forest (7.27); normal: Hybrid LSTM-XGBoost (18.33); high: Hybrid LSTM-XGBoost (28.69); peak: Hybrid LSTM-XGBoost (38.28); sudden_change: Historical Average (63.06)."
+  ],
+  "dataset": {
+    "file": "data/raw/pems04.npz",
+    "file_size_mb": 32.96,
+    "array_shape": [
+      16992,
+      307,
+      3
+    ],
+    "dtype": "float64",
+    "channels": "flow, occupancy, speed (flow used as target)",
+    "time_steps": 16992,
+    "sensors": 307,
+    "sampling_interval_minutes": 5,
+    "interval_check": "16992 steps / 288 steps per day = 59.00 days (2018-01-01 onward); a whole number of days, consistent with the documented 5-minute interval",
+    "flow_stats": {
+      "min": 0.0,
+      "max": 919.0,
+      "mean": 211.7007794815878,
+      "median": 180.0,
+      "std": 158.0684326485243
+    },
+    "nan_count": 0,
+    "inf_count": 0,
+    "negative_count": 0,
+    "zero_count": 82935,
+    "zero_pct": 1.5898456909402086,
+    "missing_values_note": "No NaNs are stored; failed readings appear as 0 flow and are treated as missing.",
+    "non_integer_flow_count": 0,
+    "identical_consecutive_rows": 0,
+    "temporal_ordering": "Rows are consecutive 5-minute steps in index order (no timestamp column in the file).",
+    "sensor_consistency": {
+      "all_sensors_same_length": true,
+      "sensors_always_zero": 0,
+      "sensors_constant": 0,
+      "sensors_with_any_zero": 169,
+      "worst_sensor_zero_pct": 38.08262711864407,
+      "longest_zero_run_steps": 408
+    },
+    "checks_passed": true
+  },
+  "preprocessing": {
+    "missing_readings": 82935,
+    "missing_pct": 1.5898456909402086,
+    "interpolated_readings": 46960,
+    "unfilled_long_gap_readings": 35975
+  },
+  "samples": {
+    "train": 3569218,
+    "val": 763134,
+    "test": 765921
+  },
+  "split_bounds": {
+    "train": [
+      0,
+      11894
+    ],
+    "val": [
+      11894,
+      14443
+    ],
+    "test": [
+      14443,
+      16992
+    ]
+  },
+  "forecast": {
+    "sequence_length": 12,
+    "horizon_steps": 3,
+    "horizon_minutes": 15
+  },
+  "split": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "hyperparameters": {
+    "Historical Average": {
+      "method": "weekday x 5-min slot x sensor mean"
+    },
+    "Random Forest": {
+      "selected": {
+        "max_depth": 20,
+        "min_samples_leaf": 5
+      },
+      "search": [
+        {
+          "params": {
+            "max_depth": 10,
+            "min_samples_leaf": 1
+          },
+          "val_mae": 22.4259
+        },
+        {
+          "params": {
+            "max_depth": 10,
+            "min_samples_leaf": 5
+          },
+          "val_mae": 22.3504
+        },
+        {
+          "params": {
+            "max_depth": 20,
+            "min_samples_leaf": 1
+          },
+          "val_mae": 21.9226
+        },
+        {
+          "params": {
+            "max_depth": 20,
+            "min_samples_leaf": 5
+          },
+          "val_mae": 21.8972
+        }
+      ],
+      "tuning_time_s": 41.54213650000747
+    },
+    "XGBoost": {
+      "selected": {
+        "max_depth": 8,
+        "learning_rate": 0.05,
+        "best_iteration": 936
+      },
+      "search": [
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.4414
+        },
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.4627
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.3355
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.3965
+        }
+      ],
+      "tuning_time_s": 24.8510420829989
+    },
+    "LSTM": {
+      "selected": {
+        "hidden_size": 32,
+        "num_layers": 2
+      },
+      "architecture": {
+        "hidden_size": 32,
+        "num_layers": 2,
+        "dropout": 0.2
+      },
+      "training": {
+        "dropout": 0.2,
+        "learning_rate": 0.001,
+        "batch_size": 1024,
+        "max_epochs": 25,
+        "patience": 5
+      },
+      "search": [
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 1
+          },
+          "val_mae": 23.6695
+        },
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 2
+          },
+          "val_mae": 23.6467
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 1
+          },
+          "val_mae": 23.71
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 2
+          },
+          "val_mae": 23.6646
+        }
+      ],
+      "tuning_time_s": 112.76007070892956,
+      "parameters": 12961
+    },
+    "GRU": {
+      "selected": {
+        "hidden_size": 64,
+        "num_layers": 2
+      },
+      "architecture": {
+        "hidden_size": 64,
+        "num_layers": 2,
+        "dropout": 0.2
+      },
+      "training": {
+        "dropout": 0.2,
+        "learning_rate": 0.001,
+        "batch_size": 1024,
+        "max_epochs": 25,
+        "patience": 5
+      },
+      "search": [
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 1
+          },
+          "val_mae": 23.6262
+        },
+        {
+          "params": {
+            "hidden_size": 32,
+            "num_layers": 2
+          },
+          "val_mae": 23.6051
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 1
+          },
+          "val_mae": 23.6136
+        },
+        {
+          "params": {
+            "hidden_size": 64,
+            "num_layers": 2
+          },
+          "val_mae": 23.422
+        }
+      ],
+      "tuning_time_s": 125.13755995791871,
+      "parameters": 37889
+    },
+    "Hybrid LSTM-XGBoost": {
+      "selected": {
+        "max_depth": 8,
+        "learning_rate": 0.05,
+        "best_iteration": 721
+      },
+      "search": [
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.3427
+        },
+        {
+          "params": {
+            "max_depth": 6,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.388
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.05
+          },
+          "val_mae": 21.2326
+        },
+        {
+          "params": {
+            "max_depth": 8,
+            "learning_rate": 0.1
+          },
+          "val_mae": 21.2506
+        }
+      ],
+      "tuning_time_s": 33.81939625006635,
+      "time_breakdown_s": {
+        "lstm_training": 517.8359319579322,
+        "feature_extraction": 9.8328934579622,
+        "xgboost_training": 122.926527124946
+      },
+      "fused_feature_count": 51
+    }
+  },
+  "final_model_comparison": [
+    {
+      "Model": "Historical Average",
+      "MAE": 24.469192504882812,
+      "RMSE": 39.67498779296875,
+      "MAPE": 13.583332030446227,
+      "Training time (s)": 0.0678280419670045,
+      "Inference time (s)": 0.0115534999640658,
+      "Inference per sample (ms)": 1.5084453832791958e-05,
+      "Parameters": NaN,
+      "Model size (MB)": 2.475927
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 20.349281311035156,
+      "RMSE": 32.43757247924805,
+      "MAPE": 11.260314042109048,
+      "Training time (s)": 131.25436854106374,
+      "Inference time (s)": 1.958936709095724,
+      "Inference per sample (ms)": 0.002557622403741,
+      "Parameters": NaN,
+      "Model size (MB)": 99.811065
+    },
+    {
+      "Model": "XGBoost",
+      "MAE": 19.978879928588867,
+      "RMSE": 31.844064712524418,
+      "MAPE": 11.182796122084488,
+      "Training time (s)": 67.07910083292518,
+      "Inference time (s)": 1.8052304580342025,
+      "Inference per sample (ms)": 0.0023569408046446,
+      "Parameters": NaN,
+      "Model size (MB)": 22.949738
+    },
+    {
+      "Model": "LSTM",
+      "MAE": 22.097312927246097,
+      "RMSE": 34.1156120300293,
+      "MAPE": 12.58685913278758,
+      "Training time (s)": 517.8359319579322,
+      "Inference time (s)": 1.1666619579773396,
+      "Inference per sample (ms)": 0.0015232144803149,
+      "Parameters": 12961.0,
+      "Model size (MB)": 0.057772
+    },
+    {
+      "Model": "GRU",
+      "MAE": 22.03031349182129,
+      "RMSE": 34.084171295166016,
+      "MAPE": 12.46198333257111,
+      "Training time (s)": 760.0495262499899,
+      "Inference time (s)": 3.093080124934204,
+      "Inference per sample (ms)": 0.0040383801004727,
+      "Parameters": 37889.0,
+      "Model size (MB)": 0.15725
+    },
+    {
+      "Model": "Hybrid LSTM-XGBoost",
+      "MAE": 19.89403533935547,
+      "RMSE": 31.712459564208984,
+      "MAPE": 11.134201570614376,
+      "Training time (s)": 650.5953525408404,
+      "Inference time (s)": 3.0669624579604715,
+      "Inference per sample (ms)": 0.0040042804126802,
+      "Parameters": NaN,
+      "Model size (MB)": 16.873921
+    }
+  ],
+  "validation_metrics": [
+    {
+      "Model": "Historical Average",
+      "MAE": 25.850391387939453,
+      "RMSE": 41.163875579833984,
+      "MAPE": 14.248682500847432
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 19.652829999697357,
+      "RMSE": 31.29992289853096,
+      "MAPE": 11.196909599291075
+    },
+    {
+      "Model": "XGBoost",
+      "MAE": 19.33280563354492,
+      "RMSE": 30.74742126464844,
+      "MAPE": 11.1211537310365
+    },
+    {
+      "Model": "LSTM",
+      "MAE": 21.294166564941406,
+      "RMSE": 32.85271072387695,
+      "MAPE": 12.524244702026996
+    },
+    {
+      "Model": "GRU",
+      "MAE": 21.24648094177246,
+      "RMSE": 32.850059509277344,
+      "MAPE": 12.394074267249891
+    },
+    {
+      "Model": "Hybrid LSTM-XGBoost",
+      "MAE": 19.25518035888672,
+      "RMSE": 30.619251251220703,
+      "MAPE": 11.079664559086162
+    }
+  ],
+  "error_analysis": {
+    "definitions": {
+      "low": "actual flow < 84 (training 25th percentile)",
+      "normal": "84 <= actual flow < 318 (training 25th-75th percentile)",
+      "high": "318 <= actual flow < 440 (training 75th-90th percentile)",
+      "peak": "actual flow >= 440 (training 90th percentile)",
+      "sudden_change": "|flow(t+3) - flow(t)| >= 81 (training 95th percentile of 15-min change); overlaps the flow-level regimes"
+    },
+    "by_regime": [
+      {
+        "Model": "Historical Average",
+        "Regime": "low",
+        "Samples": 170291,
+        "Share (%)": 22.23349405486989,
+        "MAE": 8.823654174804688,
+        "RMSE": 18.663190841674805,
+        "Mean error (bias)": 1.789759874343872
+      },
+      {
+        "Model": "Historical Average",
+        "Regime": "normal",
+        "Samples": 381075,
+        "Share (%)": 49.75382578621033,
+        "MAE": 21.918292999267575,
+        "RMSE": 35.5804557800293,
+        "Mean error (bias)": -4.238797187805176
+      },
+      {
+        "Model": "Historical Average",
+        "Regime": "high",
+        "Samples": 125436,
+        "Share (%)": 16.37714594586126,
+        "MAE": 36.16959381103515,
+        "RMSE": 48.974369049072266,
+        "Mean error (bias)": -15.714001655578612
+      },
+      {
+        "Model": "Historical Average",
+        "Regime": "peak",
+        "Samples": 89119,
+        "Share (%)": 11.635534213058529,
+        "MAE": 48.80437469482422,
+        "RMSE": 63.82510757446289,
+        "Mean error (bias)": -36.58959197998047
+      },
+      {
+        "Model": "Historical Average",
+        "Regime": "sudden_change",
+        "Samples": 41366,
+        "Share (%)": 5.400818100039038,
+        "MAE": 63.06089401245117,
+        "RMSE": 81.55287170410156,
+        "Mean error (bias)": -8.856800079345703
+      },
+      {
+        "Model": "Random Forest",
+        "Regime": "low",
+        "Samples": 170291,
+        "Share (%)": 22.23349405486989,
+        "MAE": 7.268404006958008,
+        "RMSE": 14.012933731079102,
+        "Mean error (bias)": 2.8391528129577637
+      },
+      {
+        "Model": "Random Forest",
+        "Regime": "normal",
+        "Samples": 381075,
+        "Share (%)": 49.75382578621033,
+        "MAE": 18.666439056396484,
+        "RMSE": 28.843008041381836,
+        "Mean error (bias)": 3.953339338302612
+      },
+      {
+        "Model": "Random Forest",
+        "Regime": "high",
+        "Samples": 125436,
+        "Share (%)": 16.37714594586126,
+        "MAE": 29.555570602416992,
+        "RMSE": 40.43880844116211,
+        "Mean error (bias)": -1.0141645669937134
+      },
+      {
+        "Model": "Random Forest",
+        "Regime": "peak",
+        "Samples": 89119,
+        "Share (%)": 11.635534213058529,
+        "MAE": 39.58250427246094,
+        "RMSE": 52.99749755859375,
+        "Mean error (bias)": -22.464033126831055
+      },
+      {
+        "Model": "Random Forest",
+        "Regime": "sudden_change",
+        "Samples": 41366,
+        "Share (%)": 5.400818100039038,
+        "MAE": 82.85640716552734,
+        "RMSE": 95.10052490234376,
+        "Mean error (bias)": 1.3388733863830566
+      },
+      {
+        "Model": "XGBoost",
+        "Regime": "low",
+        "Samples": 170291,
+        "Share (%)": 22.23349405486989,
+        "MAE": 7.330277442932129,
+        "RMSE": 14.025144577026367,
+        "Mean error (bias)": 2.7296695709228516
+      },
+      {
+        "Model": "XGBoost",
+        "Regime": "normal",
+        "Samples": 381075,
+        "Share (%)": 49.75382578621033,
+        "MAE": 18.39262008666992,
+        "RMSE": 28.455345153808594,
+        "Mean error (bias)": 3.684318780899048
+      },
+      {
+        "Model": "XGBoost",
+        "Regime": "high",
+        "Samples": 125436,
+        "Share (%)": 16.37714594586126,
+        "MAE": 28.82405662536621,
+        "RMSE": 39.63380813598633,
+        "Mean error (bias)": -0.9318914413452148
+      },
+      {
+        "Model": "XGBoost",
+        "Regime": "peak",
+        "Samples": 89119,
+        "Share (%)": 11.635534213058529,
+        "MAE": 38.48138046264648,
+        "RMSE": 51.63233947753906,
+        "Mean error (bias)": -21.046030044555664
+      },
+      {
+        "Model": "XGBoost",
+        "Regime": "sudden_change",
+        "Samples": 41366,
+        "Share (%)": 5.400818100039038,
+        "MAE": 79.8692398071289,
+        "RMSE": 92.67343139648438,
+        "Mean error (bias)": 2.3128557205200195
+      },
+      {
+        "Model": "LSTM",
+        "Regime": "low",
+        "Samples": 170291,
+        "Share (%)": 22.23349405486989,
+        "MAE": 8.436455726623535,
+        "RMSE": 15.147394180297852,
+        "Mean error (bias)": 3.6677005290985103
+      },
+      {
+        "Model": "LSTM",
+        "Regime": "normal",
+        "Samples": 381075,
+        "Share (%)": 49.75382578621033,
+        "MAE": 20.748876571655273,
+        "RMSE": 30.869579315185547,
+        "Mean error (bias)": 4.471969127655029
+      },
+      {
+        "Model": "LSTM",
+        "Regime": "high",
+        "Samples": 125436,
+        "Share (%)": 16.37714594586126,
+        "MAE": 31.69037437438965,
+        "RMSE": 42.73057174682617,
+        "Mean error (bias)": -1.002403974533081
+      },
+      {
+        "Model": "LSTM",
+        "Regime": "peak",
+        "Samples": 89119,
+        "Share (%)": 11.635534213058529,
+        "MAE": 40.46445846557617,
+        "RMSE": 54.033348083496094,
+        "Mean error (bias)": -22.168397903442383
+      },
+      {
+        "Model": "LSTM",
+        "Regime": "sudden_change",
+        "Samples": 41366,
+        "Share (%)": 5.400818100039038,
+        "MAE": 87.87834167480469,
+        "RMSE": 99.24917602539062,
+        "Mean error (bias)": 1.2803499698638916
+      },
+      {
+        "Model": "GRU",
+        "Regime": "low",
+        "Samples": 170291,
+        "Share (%)": 22.23349405486989,
+        "MAE": 8.178862571716309,
+        "RMSE": 14.847880363464355,
+        "Mean error (bias)": 3.3059957027435303
+      },
+      {
+        "Model": "GRU",
+        "Regime": "normal",
+        "Samples": 381075,
+        "Share (%)": 49.75382578621033,
+        "MAE": 20.621074676513672,
+        "RMSE": 30.63105201721191,
+        "Mean error (bias)": 3.198493003845215
+      },
+      {
+        "Model": "GRU",
+        "Regime": "high",
+        "Samples": 125436,
+        "Share (%)": 16.37714594586126,
+        "MAE": 32.02058410644531,
+        "RMSE": 43.189701080322266,
+        "Mean error (bias)": -2.061537981033325
+      },
+      {
+        "Model": "GRU",
+        "Regime": "peak",
+        "Samples": 89119,
+        "Share (%)": 11.635534213058529,
+        "MAE": 40.46254348754883,
+        "RMSE": 54.08831405639648,
+        "Mean error (bias)": -20.174041748046875
+      },
+      {
+        "Model": "GRU",
+        "Regime": "sudden_change",
+        "Samples": 41366,
+        "Share (%)": 5.400818100039038,
+        "MAE": 87.93636322021484,
+        "RMSE": 99.34397888183594,
+        "Mean error (bias)": 1.061240315437317
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Regime": "low",
+        "Samples": 170291,
+        "Share (%)": 22.23349405486989,
+        "MAE": 7.287640571594238,
+        "RMSE": 13.98619270324707,
+        "Mean error (bias)": 2.716172218322754
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Regime": "normal",
+        "Samples": 381075,
+        "Share (%)": 49.75382578621033,
+        "MAE": 18.33117294311523,
+        "RMSE": 28.350772857666016,
+        "Mean error (bias)": 3.6446728706359863
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Regime": "high",
+        "Samples": 125436,
+        "Share (%)": 16.37714594586126,
+        "MAE": 28.693803787231445,
+        "RMSE": 39.46268844604492,
+        "Mean error (bias)": -0.8160417079925537
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Regime": "peak",
+        "Samples": 89119,
+        "Share (%)": 11.635534213058529,
+        "MAE": 38.27973937988281,
+        "RMSE": 51.386268615722656,
+        "Mean error (bias)": -20.927387237548828
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Regime": "sudden_change",
+        "Samples": 41366,
+        "Share (%)": 5.400818100039038,
+        "MAE": 79.50072479248047,
+        "RMSE": 92.29739379882812,
+        "Mean error (bias)": 2.504689931869507
+      }
+    ],
+    "large_errors": [
+      {
+        "Model": "Historical Average",
+        "Top-1% error threshold": 147.3330078125,
+        "Regime": "low",
+        "Share of all test samples (%)": 22.23349405486989,
+        "Share of top-1% errors (%)": 6.091039520020869
+      },
+      {
+        "Model": "Historical Average",
+        "Top-1% error threshold": 147.3330078125,
+        "Regime": "normal",
+        "Share of all test samples (%)": 49.75382578621033,
+        "Share of top-1% errors (%)": 41.17647058823529
+      },
+      {
+        "Model": "Historical Average",
+        "Top-1% error threshold": 147.3330078125,
+        "Regime": "high",
+        "Share of all test samples (%)": 16.37714594586126,
+        "Share of top-1% errors (%)": 16.134081126907525
+      },
+      {
+        "Model": "Historical Average",
+        "Top-1% error threshold": 147.3330078125,
+        "Regime": "peak",
+        "Share of all test samples (%)": 11.635534213058527,
+        "Share of top-1% errors (%)": 36.59840876483631
+      },
+      {
+        "Model": "Historical Average",
+        "Top-1% error threshold": 147.3330078125,
+        "Regime": "sudden_change",
+        "Share of all test samples (%)": 5.400818100039038,
+        "Share of top-1% errors (%)": 37.00273901134734
+      },
+      {
+        "Model": "Random Forest",
+        "Top-1% error threshold": 120.37258911132812,
+        "Regime": "low",
+        "Share of all test samples (%)": 22.23349405486989,
+        "Share of top-1% errors (%)": 2.93733681462141
+      },
+      {
+        "Model": "Random Forest",
+        "Top-1% error threshold": 120.37258911132812,
+        "Regime": "normal",
+        "Share of all test samples (%)": 49.75382578621033,
+        "Share of top-1% errors (%)": 35.87467362924282
+      },
+      {
+        "Model": "Random Forest",
+        "Top-1% error threshold": 120.37258911132812,
+        "Regime": "high",
+        "Share of all test samples (%)": 16.37714594586126,
+        "Share of top-1% errors (%)": 20.613577023498696
+      },
+      {
+        "Model": "Random Forest",
+        "Top-1% error threshold": 120.37258911132812,
+        "Regime": "peak",
+        "Share of all test samples (%)": 11.635534213058527,
+        "Share of top-1% errors (%)": 40.574412532637076
+      },
+      {
+        "Model": "Random Forest",
+        "Top-1% error threshold": 120.37258911132812,
+        "Regime": "sudden_change",
+        "Share of all test samples (%)": 5.400818100039038,
+        "Share of top-1% errors (%)": 90.11749347258485
+      },
+      {
+        "Model": "XGBoost",
+        "Top-1% error threshold": 118.33320617675781,
+        "Regime": "low",
+        "Share of all test samples (%)": 22.23349405486989,
+        "Share of top-1% errors (%)": 2.93733681462141
+      },
+      {
+        "Model": "XGBoost",
+        "Top-1% error threshold": 118.33320617675781,
+        "Regime": "normal",
+        "Share of all test samples (%)": 49.75382578621033,
+        "Share of top-1% errors (%)": 37.21932114882506
+      },
+      {
+        "Model": "XGBoost",
+        "Top-1% error threshold": 118.33320617675781,
+        "Regime": "high",
+        "Share of all test samples (%)": 16.37714594586126,
+        "Share of top-1% errors (%)": 20.91383812010444
+      },
+      {
+        "Model": "XGBoost",
+        "Top-1% error threshold": 118.33320617675781,
+        "Regime": "peak",
+        "Share of all test samples (%)": 11.635534213058527,
+        "Share of top-1% errors (%)": 38.929503916449086
+      },
+      {
+        "Model": "XGBoost",
+        "Top-1% error threshold": 118.33320617675781,
+        "Regime": "sudden_change",
+        "Share of all test samples (%)": 5.400818100039038,
+        "Share of top-1% errors (%)": 89.06005221932115
+      },
+      {
+        "Model": "LSTM",
+        "Top-1% error threshold": 123.7876205444336,
+        "Regime": "low",
+        "Share of all test samples (%)": 22.23349405486989,
+        "Share of top-1% errors (%)": 2.9765013054830285
+      },
+      {
+        "Model": "LSTM",
+        "Top-1% error threshold": 123.7876205444336,
+        "Regime": "normal",
+        "Share of all test samples (%)": 49.75382578621033,
+        "Share of top-1% errors (%)": 36.30548302872062
+      },
+      {
+        "Model": "LSTM",
+        "Top-1% error threshold": 123.7876205444336,
+        "Regime": "high",
+        "Share of all test samples (%)": 16.37714594586126,
+        "Share of top-1% errors (%)": 21.93211488250653
+      },
+      {
+        "Model": "LSTM",
+        "Top-1% error threshold": 123.7876205444336,
+        "Regime": "peak",
+        "Share of all test samples (%)": 11.635534213058527,
+        "Share of top-1% errors (%)": 38.78590078328982
+      },
+      {
+        "Model": "LSTM",
+        "Top-1% error threshold": 123.7876205444336,
+        "Regime": "sudden_change",
+        "Share of all test samples (%)": 5.400818100039038,
+        "Share of top-1% errors (%)": 91.63185378590079
+      },
+      {
+        "Model": "GRU",
+        "Top-1% error threshold": 123.75080871582031,
+        "Regime": "low",
+        "Share of all test samples (%)": 22.23349405486989,
+        "Share of top-1% errors (%)": 2.8851174934725847
+      },
+      {
+        "Model": "GRU",
+        "Top-1% error threshold": 123.75080871582031,
+        "Regime": "normal",
+        "Share of all test samples (%)": 49.75382578621033,
+        "Share of top-1% errors (%)": 35.18276762402089
+      },
+      {
+        "Model": "GRU",
+        "Top-1% error threshold": 123.75080871582031,
+        "Regime": "high",
+        "Share of all test samples (%)": 16.37714594586126,
+        "Share of top-1% errors (%)": 22.950391644908617
+      },
+      {
+        "Model": "GRU",
+        "Top-1% error threshold": 123.75080871582031,
+        "Regime": "peak",
+        "Share of all test samples (%)": 11.635534213058527,
+        "Share of top-1% errors (%)": 38.98172323759791
+      },
+      {
+        "Model": "GRU",
+        "Top-1% error threshold": 123.75080871582031,
+        "Regime": "sudden_change",
+        "Share of all test samples (%)": 5.400818100039038,
+        "Share of top-1% errors (%)": 91.90600522193212
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Top-1% error threshold": 117.84638977050781,
+        "Regime": "low",
+        "Share of all test samples (%)": 22.23349405486989,
+        "Share of top-1% errors (%)": 3.1201044386422976
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Top-1% error threshold": 117.84638977050781,
+        "Regime": "normal",
+        "Share of all test samples (%)": 49.75382578621033,
+        "Share of top-1% errors (%)": 36.82767624020888
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Top-1% error threshold": 117.84638977050781,
+        "Regime": "high",
+        "Share of all test samples (%)": 16.37714594586126,
+        "Share of top-1% errors (%)": 21.057441253263708
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Top-1% error threshold": 117.84638977050781,
+        "Regime": "peak",
+        "Share of all test samples (%)": 11.635534213058527,
+        "Share of top-1% errors (%)": 38.994778067885115
+      },
+      {
+        "Model": "Hybrid LSTM-XGBoost",
+        "Top-1% error threshold": 117.84638977050781,
+        "Regime": "sudden_change",
+        "Share of all test samples (%)": 5.400818100039038,
+        "Share of top-1% errors (%)": 89.02088772845953
+      }
+    ]
+  },
+  "hybrid_feature_gain": {
+    "lstm_hidden_size": 32,
+    "lstm_feature_gain_share": 0.7311348734220748,
+    "engineered_feature_gain_share": 0.26886512657792516
+  },
+  "environment": {
+    "python": "3.14.6",
+    "os": "Darwin 25.6.0 (arm64)",
+    "libraries": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "scikit-learn": "1.9.1",
+      "xgboost": "3.4.1",
+      "torch": "2.14.0",
+      "matplotlib": "3.11.2",
+      "streamlit": "1.64.0",
+      "pyyaml": "6.0.3"
+    },
+    "device": "mps"
+  }
+}

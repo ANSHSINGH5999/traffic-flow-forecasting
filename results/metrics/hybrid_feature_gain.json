@@ -1,0 +1,5 @@
+{
+  "lstm_hidden_size": 32,
+  "lstm_feature_gain_share": 0.7311348734220748,
+  "engineered_feature_gain_share": 0.26886512657792516
+}

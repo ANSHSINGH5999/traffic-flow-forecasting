@@ -1,0 +1,15 @@
+{
+  "thresholds": {
+    "low_below": 84.0,
+    "high_from": 318.0,
+    "peak_from": 440.0,
+    "sudden_change_from": 81.0
+  },
+  "definitions": {
+    "low": "actual flow < 84 (training 25th percentile)",
+    "normal": "84 <= actual flow < 318 (training 25th-75th percentile)",
+    "high": "318 <= actual flow < 440 (training 75th-90th percentile)",
+    "peak": "actual flow >= 440 (training 90th percentile)",
+    "sudden_change": "|flow(t+3) - flow(t)| >= 81 (training 95th percentile of 15-min change); overlaps the flow-level regimes"
+  }
+}

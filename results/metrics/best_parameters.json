@@ -1,0 +1,224 @@
+{
+  "Historical Average": {
+    "method": "weekday x 5-min slot x sensor mean"
+  },
+  "Random Forest": {
+    "selected": {
+      "max_depth": 20,
+      "min_samples_leaf": 5
+    },
+    "search": [
+      {
+        "params": {
+          "max_depth": 10,
+          "min_samples_leaf": 1
+        },
+        "val_mae": 22.4259
+      },
+      {
+        "params": {
+          "max_depth": 10,
+          "min_samples_leaf": 5
+        },
+        "val_mae": 22.3504
+      },
+      {
+        "params": {
+          "max_depth": 20,
+          "min_samples_leaf": 1
+        },
+        "val_mae": 21.9226
+      },
+      {
+        "params": {
+          "max_depth": 20,
+          "min_samples_leaf": 5
+        },
+        "val_mae": 21.8972
+      }
+    ],
+    "tuning_time_s": 41.54213650000747
+  },
+  "XGBoost": {
+    "selected": {
+      "max_depth": 8,
+      "learning_rate": 0.05,
+      "best_iteration": 936
+    },
+    "search": [
+      {
+        "params": {
+          "max_depth": 6,
+          "learning_rate": 0.05
+        },
+        "val_mae": 21.4414
+      },
+      {
+        "params": {
+          "max_depth": 6,
+          "learning_rate": 0.1
+        },
+        "val_mae": 21.4627
+      },
+      {
+        "params": {
+          "max_depth": 8,
+          "learning_rate": 0.05
+        },
+        "val_mae": 21.3355
+      },
+      {
+        "params": {
+          "max_depth": 8,
+          "learning_rate": 0.1
+        },
+        "val_mae": 21.3965
+      }
+    ],
+    "tuning_time_s": 24.8510420829989
+  },
+  "LSTM": {
+    "selected": {
+      "hidden_size": 32,
+      "num_layers": 2
+    },
+    "architecture": {
+      "hidden_size": 32,
+      "num_layers": 2,
+      "dropout": 0.2
+    },
+    "training": {
+      "dropout": 0.2,
+      "learning_rate": 0.001,
+      "batch_size": 1024,
+      "max_epochs": 25,
+      "patience": 5
+    },
+    "search": [
+      {
+        "params": {
+          "hidden_size": 32,
+          "num_layers": 1
+        },
+        "val_mae": 23.6695
+      },
+      {
+        "params": {
+          "hidden_size": 32,
+          "num_layers": 2
+        },
+        "val_mae": 23.6467
+      },
+      {
+        "params": {
+          "hidden_size": 64,
+          "num_layers": 1
+        },
+        "val_mae": 23.71
+      },
+      {
+        "params": {
+          "hidden_size": 64,
+          "num_layers": 2
+        },
+        "val_mae": 23.6646
+      }
+    ],
+    "tuning_time_s": 112.76007070892956,
+    "parameters": 12961
+  },
+  "GRU": {
+    "selected": {
+      "hidden_size": 64,
+      "num_layers": 2
+    },
+    "architecture": {
+      "hidden_size": 64,
+      "num_layers": 2,
+      "dropout": 0.2
+    },
+    "training": {
+      "dropout": 0.2,
+      "learning_rate": 0.001,
+      "batch_size": 1024,
+      "max_epochs": 25,
+      "patience": 5
+    },
+    "search": [
+      {
+        "params": {
+          "hidden_size": 32,
+          "num_layers": 1
+        },
+        "val_mae": 23.6262
+      },
+      {
+        "params": {
+          "hidden_size": 32,
+          "num_layers": 2
+        },
+        "val_mae": 23.6051
+      },
+      {
+        "params": {
+          "hidden_size": 64,
+          "num_layers": 1
+        },
+        "val_mae": 23.6136
+      },
+      {
+        "params": {
+          "hidden_size": 64,
+          "num_layers": 2
+        },
+        "val_mae": 23.422
+      }
+    ],
+    "tuning_time_s": 125.13755995791871,
+    "parameters": 37889
+  },
+  "Hybrid LSTM-XGBoost": {
+    "selected": {
+      "max_depth": 8,
+      "learning_rate": 0.05,
+      "best_iteration": 721
+    },
+    "search": [
+      {
+        "params": {
+          "max_depth": 6,
+          "learning_rate": 0.05
+        },
+        "val_mae": 21.3427
+      },
+      {
+        "params": {
+          "max_depth": 6,
+          "learning_rate": 0.1
+        },
+        "val_mae": 21.388
+      },
+      {
+        "params": {
+          "max_depth": 8,
+          "learning_rate": 0.05
+        },
+        "val_mae": 21.2326
+      },
+      {
+        "params": {
+          "max_depth": 8,
+          "learning_rate": 0.1
+        },
+        "val_mae": 21.2506
+      }
+    ],
+    "tuning_time_s": 33.81939625006635,
+    "time_breakdown_s": {
+      "lstm_training": 517.8359319579322,
+      "feature_extraction": 9.8328934579622,
+      "xgboost_training": 122.926527124946
+    },
+    "fused_feature_count": 51
+  }
+}

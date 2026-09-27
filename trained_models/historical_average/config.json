@@ -1,0 +1,5 @@
+{
+  "steps_per_day": 288,
+  "start_weekday": 0,
+  "method": "mean training flow per (weekday, 5-min slot, sensor); fallback slot -> sensor -> global"
+}
