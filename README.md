@@ -1,5 +1,10 @@
 # An Enhanced Machine Learning Framework for Short-Term Traffic Flow Forecasting
 
+- **Live results site:** https://traffic-flow-forecasting.vercel.app (interactive explorer of the real test predictions)
+- **Code, data & trained models:** https://github.com/ANSHSINGH5999/traffic-flow-forecasting
+- **Run the live-model demo:** `streamlit run app/app.py` locally, or deploy `app/app.py` on
+[Streamlit Community Cloud](https://share.streamlit.io/deploy?repository=ANSHSINGH5999/traffic-flow-forecasting&branch=main&mainModule=app/app.py) (Python 3.12; uses `app/requirements.txt`)
+
 An end-to-end, reproducible research system. It trains **six forecasting models** on the real **PeMSD4**
 traffic dataset under one identical experimental setup, evaluates them on the same unseen test period,
 saves the trained models, and serves them in a **Streamlit** demo app.
@@ -239,7 +244,8 @@ src/training/          tuning.py, train_baselines.py, train_deep_learning.py, tr
 src/evaluation/        metrics.py, evaluator.py, error_analysis.py
 src/visualization/     plots.py
 src/reporting.py       final_results.md / .json
-app/                   app.py, components/predictor.py, components/descriptions.py
+app/                   app.py, components/predictor.py, components/descriptions.py, requirements.txt (cloud)
+site/                  static results site deployed on Vercel
 scripts/               audit_experiment.py, test_inference.py
 tests/                 unit, model and app tests
 trained_models/        saved models + preprocessing/scaler.pkl
