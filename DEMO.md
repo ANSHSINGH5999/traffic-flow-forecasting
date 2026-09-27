@@ -23,7 +23,7 @@ What to say:
 ```bash
 streamlit run app/app.py
 ```
-The browser opens at http://localhost:8501. It is a **historical-data forecast demonstration**, not live traffic.
+Open http://localhost:8501 in the browser. It is a **historical-data forecast demonstration**, not live traffic.
 
 ## 4. Select sensor
 Sidebar → **Sensor** (e.g. 0). "Recent traffic history" shows the last 3 hours. The **bold** part is the

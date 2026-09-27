@@ -1,0 +1,5 @@
+[server]
+headless = true        # no first-run e-mail prompt; open http://localhost:8501 yourself
+
+[browser]
+gatherUsageStats = false
