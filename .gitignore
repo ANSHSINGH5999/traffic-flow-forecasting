@@ -8,3 +8,7 @@ trained_models_debug/
 # large generated artifacts (regenerate with: python run_pipeline.py --mode final)
 results/predictions/*.csv
 final_run_console.log
+experiments/stgcn/results/predictions/*.csv
+experiments/stgcn/stgcn_final_console.log
+experiments/stgcn/results_debug/
+experiments/stgcn/trained_model_debug/
