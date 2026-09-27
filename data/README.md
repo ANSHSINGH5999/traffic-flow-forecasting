@@ -1,6 +1,6 @@
 # Dataset setup - PeMSD4
 
-Required file: `data/raw/pems04.npz`
+Required file: `data/raw/pems04.npz` (included in this repository, 33 MB)
 
 | Property | Value (verified by `python -m src.data.validator`) |
 |---|---|
@@ -10,7 +10,7 @@ Required file: `data/raw/pems04.npz`
 | Interval | 5 minutes (16992 / 288 = 59 whole days, 1 Jan - 28 Feb 2018) |
 | Region | San Francisco Bay Area (Caltrans PeMS District 4) |
 
-Download: the file is distributed with the ASTGCN (Guo et al., AAAI 2019) code repository.
+Source: the file is distributed with the ASTGCN (Guo et al., AAAI 2019) code repository.
 
 ```bash
 mkdir -p data/raw

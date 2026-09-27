@@ -2,12 +2,9 @@
 __pycache__/
 .pytest_cache/
 .DS_Store
-# large raw dataset - download instructions in data/README.md
-data/raw/*.npz
 # debug runs are never research results
 results_debug/
 trained_models_debug/
 # large generated artifacts (regenerate with: python run_pipeline.py --mode final)
 results/predictions/*.csv
-trained_models/random_forest/model.pkl
 final_run_console.log
