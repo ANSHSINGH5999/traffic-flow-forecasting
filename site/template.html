@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Seven traffic-flow forecasting models compared on real PeMSD4 data at a 15-minute horizon.">
+<title>PeMSD4 Forecast Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f2;--surface:#ffffff;--ink:#1b2320;--muted:#5a6962;--line:#d8dfda;--grid:#e6ebe7;
+  --sign:#13643f;--sign-ink:#ffffff;--amber:#b87200;--best:#e3f1e8;
+  --ha:#848f8a;--stg:#00838f;--rf:#2f8f4e;--xgb:#c99300;--lstm:#2f6fce;--gru:#7a4cc2;--hyb:#d0402e;--act:#1b2320;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;--body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0f1412;--surface:#161d1a;--ink:#e6ece8;--muted:#94a39c;--line:#27322d;--grid:#1f2824;
+  --sign:#1b7a4d;--amber:#e2a33a;--best:#1c3527;--ha:#98a39e;--stg:#2bb3c0;--act:#e6ece8;--lstm:#5b92e6;--gru:#9b74dc;--hyb:#ea5f4c;--xgb:#dcaa22;--rf:#46a865}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0f1412;--surface:#161d1a;--ink:#e6ece8;--muted:#94a39c;--line:#27322d;--grid:#1f2824;
+  --sign:#1b7a4d;--amber:#e2a33a;--best:#1c3527;--ha:#98a39e;--stg:#2bb3c0;--act:#e6ece8;--lstm:#5b92e6;--gru:#9b74dc;--hyb:#ea5f4c;--xgb:#dcaa22;--rf:#46a865}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:0 72px}
+.band{background:var(--sign);color:var(--sign-ink);margin-inline:-20px;padding:10px 20px;display:flex;flex-wrap:wrap;gap:6px 22px;
+  font:600 14px/1.2 var(--display);letter-spacing:.12em;text-transform:uppercase;border-bottom:4px solid var(--amber)}
+header{padding-block:36px 8px}
+h1{font:700 clamp(34px,6vw,58px)/1.02 var(--display);margin:0 0 14px;text-wrap:balance;letter-spacing:.005em}
+h2{font:700 30px/1.1 var(--display);margin:0 0 6px;letter-spacing:.01em;text-wrap:balance}
+h3{font:600 20px/1.2 var(--display);margin:0 0 8px;letter-spacing:.02em}
+.lede{font-size:19px;max-width:62ch;margin:0 0 14px}
+.meta{color:var(--muted);font:13px/1.5 var(--mono)}
+section{padding-block:40px 0}
+.sub{color:var(--muted);max-width:68ch;margin:0 0 18px}
+.num,td.n,th.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font:600 13px/1.2 var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+td.n,th.n{text-align:right}
+tr:last-child td{border-bottom:0}
+td.best{background:var(--best);font-weight:500}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:baseline}
+.bar{height:6px;background:var(--line);min-width:90px;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;display:block}
+.callout{border-left:4px solid var(--amber);background:var(--surface);padding:14px 16px;margin-top:16px;max-width:80ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:end;margin-bottom:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font:600 12px/1 var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+select{font:15px var(--body);padding:7px 10px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:14px var(--body);padding:5px 10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.chip[aria-pressed="false"]{opacity:.45}
+.chip i{width:14px;height:3px;display:block}
+button:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.chart{background:var(--surface);border:1px solid var(--line);padding:8px 8px 4px}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{fill:var(--muted);font:11px var(--mono)}
+.maes{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:14px}
+.maes b{font-family:var(--mono);font-weight:500}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+ol.steps{margin:0;padding-left:22px;display:grid;gap:6px;max-width:75ch}
+ul.clean{margin:0;padding-left:20px;display:grid;gap:8px;max-width:80ch}
+pre.cmd{background:var(--surface);border:1px solid var(--line);padding:14px 16px;overflow-x:auto;font:13.5px/1.6 var(--mono);margin:0}
+.mermaid{background:var(--surface);border:1px solid var(--line);padding:12px;overflow-x:auto;margin:0}
+.kpis{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:18px}
+.kpi b{display:block;font:700 28px/1 var(--display);letter-spacing:.02em}
+.kpi span{color:var(--muted);font-size:13px}
+footer{color:var(--muted);font-size:13px;padding-top:48px}
+@media (prefers-reduced-motion:no-preference){.chart path{transition:opacity .2s}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="band"><span>Caltrans District 4 · Bay Area</span><span>PeMSD4</span><span>307 detectors</span><span>5-min readings</span><span>Horizon t + 3</span></div>
+
+  <header>
+    <h1>Forecasting freeway traffic flow 15 minutes ahead</h1>
+    <p class="lede">Seven forecasting models were trained on real PeMSD4 loop-detector data under one identical setup and scored on the
+      same unseen final nine days (20–28 Feb 2018). Each one predicts the flow 15 minutes ahead from the last 60 minutes. Six models read one sensor's
+      history. STGCN reads all 307 sensors at once, together with the road network that connects them.</p>
+    <p class="meta" id="meta"></p>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <section id="results">
+    <h2>Test-set results</h2>
+    <p class="sub">Locked test period, all 307 sensors. Lower is better, and the best value in each column is shaded. MAPE counts only
+      readings of at least 10 vehicles per 5 minutes, because dividing by near-zero night-time flow gives meaningless percentages.</p>
+    <div class="tablewrap"><table id="tbl"></table></div>
+    <div class="callout" id="verdict"></div>
+  </section>
+
+  <section id="explorer">
+    <h2>Explore the forecasts</h2>
+    <p class="sub">These are the models' stored test predictions for 21 sensors spread across the network, not a new simulation.
+      Pick a sensor and a day, then switch models on or off. Each point is a forecast made 15 minutes earlier.</p>
+    <div class="controls">
+      <label class="f" for="sensor">Sensor<select id="sensor"></select></label>
+      <label class="f" for="day">Day<select id="day"></select></label>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Models shown"></div>
+    <div class="chart" style="margin-top:12px"><svg id="dayChart" viewBox="0 0 1000 380" role="img" aria-label="Actual and forecast traffic flow for the selected sensor and day"></svg></div>
+    <div class="maes" id="dayMae"></div>
+  </section>
+
+  <section id="errors">
+    <h2>Where the errors happen</h2>
+    <p class="sub">Test samples are grouped by rules computed from the training data only. The table shows MAE (vehicles / 5 min) in each group.</p>
+    <div class="tablewrap"><table id="regTbl"></table></div>
+    <ul class="clean" id="regDefs" style="margin-top:14px;color:var(--muted);font-size:14px"></ul>
+    <div style="margin-top:22px">
+      <h3>MAE by hour of day</h3>
+      <div class="chart"><svg id="hourChart" viewBox="0 0 1000 300" role="img" aria-label="MAE by hour of day for each model"></svg></div>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>How the experiment works</h2>
+    <div class="grid2">
+      <div>
+        <h3>Pipeline</h3>
+        <ol class="steps">
+          <li>Validate the raw file: 16,992 steps × 307 sensors, no NaN or negative values.</li>
+          <li>Treat zero flow as a sensor failure. Fill gaps of up to 1 hour in time and drop longer gaps.</li>
+          <li>Split the timeline 70 / 15 / 15 in order (train, validation, test). Nothing is shuffled.</li>
+          <li>Build windows of 12 readings (60 min) → the target 3 steps later (15 min).</li>
+          <li>Pick each model's settings with a small grid search on the validation set.</li>
+          <li>Freeze and save every model, then score the test set once.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Leakage rules (checked by the audit script)</h3>
+        <ul class="clean">
+          <li>The scaler is fitted on training readings only.</li>
+          <li>The reading at forecast time t must be real, so gap-filling never uses readings after t.</li>
+          <li>Targets are real readings. Interpolated values are never scored.</li>
+          <li>Windows never cross a split boundary.</li>
+          <li>Tuning and early stopping use validation data only.</li>
+          <li>STGCN uses a neighbour's reading only if it was known by time t. Anything else is zeroed and flagged. It is scored on exactly the same test samples.</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:22px">
+      <h3>The spatial model (STGCN)</h3>
+      <p class="sub">STGCN (Yu et al., 2018) combines graph convolutions over the road network with gated convolutions over time. Its graph comes
+        from <code>distance.csv</code>, published with PeMSD4: 340 road links between the 307 sensors, weighted by distance. Settings were chosen on the validation set.</p>
+    </div>
+    <div style="margin-top:22px">
+      <h3>The hybrid model</h3>
+      <p class="sub">The LSTM does not vote. After training, it is frozen, and its hidden state becomes extra input for XGBoost.</p>
+<pre class="mermaid">
+flowchart LR
+  A["Last 60 min<br/>12 readings"] --> B["Trained LSTM<br/>(frozen)"]
+  B --> C["Hidden state<br/>32 learned features"]
+  A --> D["19 engineered features<br/>lags, rolling stats, hour, weekday"]
+  C --> E["XGBoost"]
+  D --> E
+  E --> F["Flow at t + 15 min"]
+</pre>
+      <p class="sub" id="gain" style="margin-top:10px"></p>
+    </div>
+  </section>
+
+  <section id="findings">
+    <h2>Findings</h2>
+    <p class="sub">These findings were generated from the result files and apply to this dataset, horizon and setup.</p>
+    <ul class="clean" id="findList"></ul>
+    <h3 style="margin-top:22px">Limitations</h3>
+    <ul class="clean">
+      <li>One dataset (Bay Area, 59 days) and one horizon (15 min).</li>
+      <li>Only flow history, calendar time and (for STGCN) the road graph are used. There is no weather or incident information.</li>
+      <li>There is one training run per model, so the 0.4% (hybrid vs XGBoost) and 2–3% (STGCN vs hybrid) gaps have no confidence intervals.</li>
+      <li>The sensor graph's geography cannot be checked directly, because there are no coordinates. Connected sensors do show more strongly correlated traffic.</li>
+      <li>Times when the sensor was offline at the forecast moment are not scored.</li>
+    </ul>
+  </section>
+
+  <section id="run">
+    <h2>Run it yourself</h2>
+    <p class="sub">Code, data and trained models: <a href="https://github.com/ANSHSINGH5999/traffic-flow-forecasting" style="color:var(--sign)">github.com/ANSHSINGH5999/traffic-flow-forecasting</a>.
+      The Streamlit demo loads the saved models, so nothing is retrained.</p>
+<pre class="cmd">git clone https://github.com/ANSHSINGH5999/traffic-flow-forecasting.git &amp;&amp; cd traffic-flow-forecasting
+python -m venv .venv &amp;&amp; source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt                    # macOS also needs: brew install libomp
+python -m pytest -q tests                          # 26 tests
+python scripts/audit_experiment.py                 # data, leakage, models, app
+python -m experiments.stgcn.run_stgcn --mode final  # STGCN (7th model)
+streamlit run app/app.py                           # open http://localhost:8501</pre>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({startOnLoad: true, theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "neutral"});
+</script>
+<script>
+const D = __DATA__;
+const COL = {"STGCN":"--stg","Historical Average":"--ha","Random Forest":"--rf","XGBoost":"--xgb","LSTM":"--lstm","GRU":"--gru","Hybrid LSTM-XGBoost":"--hyb","Actual":"--act"};
+const MODELS = D.comparison.map(r => r.Model);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const f = (v, d = 2) => Number(v).toLocaleString("en-US", {minimumFractionDigits: d, maximumFractionDigits: d});
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const START = Date.UTC(2018, 0, 1), STEP = 5 * 60000, SPD = 288;
+const fmtDay = d => new Date(START + d * 86400000).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short", year:"numeric", timeZone:"UTC"});
+
+// header
+const best = k => Math.min(...D.comparison.map(r => r[k]));
+document.getElementById("meta").textContent =
+  `Experiment ${D.experiment} · test ${fmtDay(Math.floor(D.bounds.test[0] / SPD))} – ${fmtDay(Math.floor((D.bounds.test[1] - 1) / SPD))} · ${D.samples.test.toLocaleString()} test samples`;
+const hy = D.comparison.find(r => r.Model === "Hybrid LSTM-XGBoost"), ha = D.comparison.find(r => r.Model === "Historical Average");
+document.getElementById("kpis").innerHTML = [
+  [f(best("MAE")), `lowest MAE (${D.comparison.find(r => r.MAE === best("MAE")).Model}), vehicles / 5 min`],
+  [f((ha.MAE - best("MAE")) / ha.MAE * 100, 1) + "%", "lower MAE than the historical-average baseline"],
+  [D.samples.train.toLocaleString(), "training samples"],
+].map(([b, s]) => `<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join("");
+
+// results table
+const maxMae = Math.max(...D.comparison.map(r => r.MAE));
+document.getElementById("tbl").innerHTML =
+  `<tr><th>Model</th><th class="n">MAE</th><th></th><th class="n">RMSE</th><th class="n">MAPE %</th><th class="n">Train (s)</th><th class="n">Predict (s)</th></tr>` +
+  D.comparison.map(r => `<tr><td><span class="swatch" style="background:var(${COL[r.Model]})"></span>${esc(r.Model)}</td>
+    <td class="n ${r.MAE === best("MAE") ? "best" : ""}">${f(r.MAE, 3)}</td>
+    <td><div class="bar"><i style="width:${r.MAE / maxMae * 100}%;background:var(${COL[r.Model]})"></i></div></td>
+    <td class="n ${r.RMSE === best("RMSE") ? "best" : ""}">${f(r.RMSE, 3)}</td>
+    <td class="n ${r.MAPE === best("MAPE") ? "best" : ""}">${f(r.MAPE, 3)}</td>
+    <td class="n">${f(r["Training time (s)"], 1)}</td><td class="n">${f(r["Inference time (s)"], 2)}</td></tr>`).join("");
+document.getElementById("verdict").innerHTML = D.verdict.map(([h, t]) => `<p style="margin:0 0 8px"><b>${esc(h)}</b> ${esc(t)}</p>`).join("");
+
+// explorer
+const sensorSel = document.getElementById("sensor"), daySel = document.getElementById("day");
+Object.keys(D.sensors).forEach(s => sensorSel.add(new Option("Sensor " + s, s)));
+const d0 = Math.ceil(D.testStart / SPD), d1 = Math.floor((D.testStart + D.len - 1) / SPD);
+for (let d = d0; d <= d1; d++) daySel.add(new Option(fmtDay(d), d));
+const on = new Set(["STGCN", "Hybrid LSTM-XGBoost"]);
+const chips = document.getElementById("chips");
+MODELS.forEach(m => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.type = "button"; b.setAttribute("aria-pressed", on.has(m));
+  b.innerHTML = `<i style="background:var(${COL[m]})"></i>${esc(m)}`;
+  b.onclick = () => { on.has(m) ? on.delete(m) : on.add(m); b.setAttribute("aria-pressed", on.has(m)); drawDay(); };
+  chips.appendChild(b);
+});
+sensorSel.onchange = daySel.onchange = drawDay;
+
+function axes(W, H, L, B, T, R, xTicks, yMax, xFmt) {
+  const x = v => L + (v - xTicks.min) / (xTicks.max - xTicks.min) * (W - L - R);
+  const y = v => T + (1 - v / yMax) * (H - T - B);
+  let s = "";
+  const step = yMax / 4;
+  for (let k = 0; k <= 4; k++) { const v = step * k;
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${css("--grid")}"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${Math.round(v)}</text>`; }
+  for (const v of xTicks.ticks) s += `<text x="${x(v)}" y="${H - 8}" text-anchor="middle">${xFmt(v)}</text>`;
+  return {x, y, s};
+}
+const pathOf = (pts) => { let d = "", pen = false; for (const [a, b] of pts) { if (b === null) { pen = false; continue; } d += (pen ? "L" : "M") + a.toFixed(1) + "," + b.toFixed(1); pen = true; } return d; };
+
+function drawDay() {
+  const S = D.sensors[sensorSel.value], day = +daySel.value;
+  const a = Math.max(0, day * SPD - D.testStart), b = Math.min(D.len, day * SPD + SPD - D.testStart);
+  const idx = []; for (let i = a; i < b; i++) idx.push(i);
+  const hr = i => ((i + D.testStart) % SPD) / 12;
+  const shown = ["Actual", ...MODELS.filter(m => on.has(m))];
+  const vals = shown.flatMap(k => idx.map(i => S[k][i])).filter(v => v !== null);
+  const yMax = Math.ceil(Math.max(50, ...vals) / 100) * 100;
+  const W = 1000, H = 380;
+  const g = axes(W, H, 46, 28, 12, 14, {min: 0, max: 24, ticks: [0, 3, 6, 9, 12, 15, 18, 21, 24]}, yMax, v => `${String(v).padStart(2, "0")}:00`);
+  let s = g.s + `<text x="46" y="10" text-anchor="start">vehicles / 5 min</text>`;
+  shown.forEach(k => {
+    s += `<path d="${pathOf(idx.map(i => [g.x(hr(i)), S[k][i] === null ? null : g.y(S[k][i])]))}" fill="none" stroke="${css(COL[k])}" stroke-width="${k === "Actual" ? 1.8 : 1.5}" stroke-linejoin="round"/>`;
+  });
+  document.getElementById("dayChart").innerHTML = s;
+  document.getElementById("dayMae").innerHTML = `<span style="color:var(--muted)">MAE this day:</span>` + MODELS.map(m => {
+    let e = 0, n = 0; idx.forEach(i => { if (S.Actual[i] !== null && S[m][i] !== null) { e += Math.abs(S.Actual[i] - S[m][i]); n++; } });
+    return `<span><span class="swatch" style="background:var(${COL[m]})"></span>${esc(m)} <b>${n ? f(e / n) : "–"}</b></span>`;
+  }).join("");
+}
+
+// regimes
+const REG = ["low", "normal", "high", "peak", "sudden_change"];
+const regBest = Object.fromEntries(REG.map(r => [r, Math.min(...D.regime.filter(x => x.Regime === r).map(x => x.MAE))]));
+const share = Object.fromEntries(REG.map(r => [r, D.regime.find(x => x.Regime === r)["Share (%)"]]));
+document.getElementById("regTbl").innerHTML =
+  `<tr><th>Model</th>${REG.map(r => `<th class="n">${r.replace("_", " ")}<br><span style="font-weight:400;text-transform:none">${f(share[r], 1)}% of samples</span></th>`).join("")}</tr>` +
+  MODELS.map(m => `<tr><td><span class="swatch" style="background:var(${COL[m]})"></span>${esc(m)}</td>` +
+    REG.map(r => { const v = D.regime.find(x => x.Model === m && x.Regime === r).MAE; return `<td class="n ${v === regBest[r] ? "best" : ""}">${f(v)}</td>`; }).join("") + "</tr>").join("");
+document.getElementById("regDefs").innerHTML = Object.entries(D.regimeDefs).map(([k, v]) => `<li><b>${esc(k.replace("_", " "))}</b>: ${esc(v)}</li>`).join("");
+
+function drawHour() {
+  const W = 1000, H = 300;
+  const yMax = Math.ceil(Math.max(...MODELS.flatMap(m => D.hour[m])) / 10) * 10;
+  const g = axes(W, H, 46, 28, 12, 14, {min: 0, max: 23, ticks: [0, 3, 6, 9, 12, 15, 18, 21]}, yMax, v => `${String(v).padStart(2, "0")}h`);
+  let s = g.s + `<text x="46" y="10" text-anchor="start">MAE, vehicles / 5 min</text>`;
+  MODELS.forEach(m => { s += `<path d="${pathOf(D.hour[m].map((v, h) => [g.x(h), g.y(v)]))}" fill="none" stroke="${css(COL[m])}" stroke-width="1.8"/>`; });
+  document.getElementById("hourChart").innerHTML = s;
+}
+
+document.getElementById("gain").textContent =
+  `Inside the trained hybrid, the LSTM features account for ${f(D.hybridGain.lstm_feature_gain_share * 100, 1)}% of XGBoost's total split gain and the engineered features for ${f(D.hybridGain.engineered_feature_gain_share * 100, 1)}%. This measures how much the model uses each group, not what causes the result.`;
+document.getElementById("findList").innerHTML = D.findings.map(l => `<li>${esc(l)}</li>`).join("");
+document.getElementById("foot").textContent =
+  `Every number on this page is read from the project's result files (six-model experiment ${D.experiment}, plus the STGCN run on the same test set). Dataset: PeMSD4 (${D.dataset.array_shape.join(" × ")}), ${f(D.dataset.zero_pct)}% zero readings treated as missing.`;
+
+daySel.value = d0 + 1;
+drawDay(); drawHour();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawDay(); drawHour(); });
+new MutationObserver(() => { drawDay(); drawHour(); }).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+</script>
+
+</body>
+</html>

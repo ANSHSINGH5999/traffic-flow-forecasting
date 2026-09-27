@@ -1,6 +1,6 @@
 # An Enhanced Machine Learning Framework for Short-Term Traffic Flow Forecasting
 
-- **Live results site:** https://traffic-flow-forecasting.vercel.app (interactive explorer of the real test predictions)
+- **Live results site:** https://traffic-flow-forecasting.vercel.app (interactive explorer of the real test predictions, all seven models)
 - **Code, data & trained models:** https://github.com/ANSHSINGH5999/traffic-flow-forecasting
 - **Run the live-model demo:** `streamlit run app/app.py` locally, or deploy `app/app.py` on
 [Streamlit Community Cloud](https://share.streamlit.io/deploy?repository=ANSHSINGH5999/traffic-flow-forecasting&branch=main&mainModule=app/app.py) (Python 3.12; uses `app/requirements.txt`)
@@ -165,6 +165,13 @@ These findings hold for this dataset, horizon and setup. They are not a general 
 over XGBoost is small (under 0.5% on each metric) and comes from a single run, without repeated seeds or significance testing.
 Full report: [`results/reports/final_results.md`](results/reports/final_results.md).
 
+### Additional experiment: STGCN (7th model, spatial)
+STGCN (Yu et al., 2018) uses the PeMSD4 road graph (`data/raw/pems04_distance.csv`, 340 links). It was evaluated on **exactly the same
+765,921 locked test samples** under the same protocol. Measured: MAE 19.494, RMSE 30.773, MAPE 10.997%, training
+2399 s. This is the lowest error of the seven models, at the highest training cost. It is a single run, so treat the
+2–3% margin over the hybrid/XGBoost with caution. Full report: [`experiments/stgcn/STGCN_REPORT.md`](experiments/stgcn/STGCN_REPORT.md).
+Reproduce: `python -m experiments.stgcn.run_stgcn --mode final`. The Streamlit app serves the six original models. STGCN appears on the results site.
+
 
 ## 14. Error analysis
 All thresholds are computed from **training** targets, so they are data-driven and leak nothing from the test set:
@@ -245,7 +252,8 @@ src/evaluation/        metrics.py, evaluator.py, error_analysis.py
 src/visualization/     plots.py
 src/reporting.py       final_results.md / .json
 app/                   app.py, components/predictor.py, components/descriptions.py, requirements.txt (cloud)
-site/                  static results site deployed on Vercel
+site/                  static results site deployed on Vercel (build: python site/build_site.py)
+experiments/stgcn/     STGCN experiment (7th model): code, results, report
 scripts/               audit_experiment.py, test_inference.py
 tests/                 unit, model and app tests
 trained_models/        saved models + preprocessing/scaler.pkl
