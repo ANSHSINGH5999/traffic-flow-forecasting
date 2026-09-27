@@ -1,0 +1,189 @@
+{
+  "architecture": {
+    "channels": [
+      64,
+      16,
+      64
+    ],
+    "cheb_k": 2
+  },
+  "fixed": {
+    "kt": 3,
+    "dropout": 0.0,
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "max_epochs": 50,
+    "patience": 8
+  },
+  "graph": {
+    "source": "data/raw/pems04_distance.csv (distributed with pems04.npz by the ASTGCN authors)",
+    "edges": 340,
+    "nodes": 307,
+    "sigma_m": 257.5186550500138,
+    "weighting": "w = exp(-(d/sigma)^2), sigma = std of edge distances; symmetric; road edges only",
+    "laplacian": "scaled normalised Laplacian, Chebyshev polynomials",
+    "lambda_max": 2.000000000000002
+  },
+  "input_channels": [
+    "scaled flow",
+    "availability mask"
+  ],
+  "parameters": 141825,
+  "history": [
+    {
+      "epoch": 1,
+      "train_mse_scaled": 0.06269494005910416,
+      "val_mae": 23.22698475617616
+    },
+    {
+      "epoch": 2,
+      "train_mse_scaled": 0.04620363999924442,
+      "val_mae": 21.75934566096935
+    },
+    {
+      "epoch": 3,
+      "train_mse_scaled": 0.04417265877680364,
+      "val_mae": 23.01764627084305
+    },
+    {
+      "epoch": 4,
+      "train_mse_scaled": 0.04273014284441741,
+      "val_mae": 21.396814117996698
+    },
+    {
+      "epoch": 5,
+      "train_mse_scaled": 0.04135180374221024,
+      "val_mae": 20.192974858960238
+    },
+    {
+      "epoch": 6,
+      "train_mse_scaled": 0.040548397734193296,
+      "val_mae": 19.83310795477407
+    },
+    {
+      "epoch": 7,
+      "train_mse_scaled": 0.03982579467265655,
+      "val_mae": 21.62114487232399
+    },
+    {
+      "epoch": 8,
+      "train_mse_scaled": 0.039027246283144704,
+      "val_mae": 21.21658556897229
+    },
+    {
+      "epoch": 9,
+      "train_mse_scaled": 0.03860107941755491,
+      "val_mae": 19.471293658536027
+    },
+    {
+      "epoch": 10,
+      "train_mse_scaled": 0.03803005541710768,
+      "val_mae": 20.247763418000538
+    },
+    {
+      "epoch": 11,
+      "train_mse_scaled": 0.0378199713036187,
+      "val_mae": 19.159834854304773
+    },
+    {
+      "epoch": 12,
+      "train_mse_scaled": 0.03734783872759394,
+      "val_mae": 20.871464350658137
+    },
+    {
+      "epoch": 13,
+      "train_mse_scaled": 0.037342629470388425,
+      "val_mae": 19.580052057517115
+    },
+    {
+      "epoch": 14,
+      "train_mse_scaled": 0.03696072398248239,
+      "val_mae": 20.384073953133893
+    },
+    {
+      "epoch": 15,
+      "train_mse_scaled": 0.03698004640549207,
+      "val_mae": 19.829534770933375
+    },
+    {
+      "epoch": 16,
+      "train_mse_scaled": 0.036578370251114746,
+      "val_mae": 19.264261394244667
+    },
+    {
+      "epoch": 17,
+      "train_mse_scaled": 0.03634397903443347,
+      "val_mae": 19.379458093831765
+    },
+    {
+      "epoch": 18,
+      "train_mse_scaled": 0.03616946463514558,
+      "val_mae": 19.353246692446856
+    },
+    {
+      "epoch": 19,
+      "train_mse_scaled": 0.036255425814073795,
+      "val_mae": 18.928808089396608
+    },
+    {
+      "epoch": 20,
+      "train_mse_scaled": 0.03569911228240667,
+      "val_mae": 19.142208467291415
+    },
+    {
+      "epoch": 21,
+      "train_mse_scaled": 0.035648576167476305,
+      "val_mae": 19.141762101013246
+    },
+    {
+      "epoch": 22,
+      "train_mse_scaled": 0.035492277027134256,
+      "val_mae": 19.270028756997466
+    },
+    {
+      "epoch": 23,
+      "train_mse_scaled": 0.035272209434188455,
+      "val_mae": 18.779844158544623
+    },
+    {
+      "epoch": 24,
+      "train_mse_scaled": 0.03533213999501935,
+      "val_mae": 18.96694249206816
+    },
+    {
+      "epoch": 25,
+      "train_mse_scaled": 0.03504629642310393,
+      "val_mae": 20.204572407206257
+    },
+    {
+      "epoch": 26,
+      "train_mse_scaled": 0.03502719234155727,
+      "val_mae": 19.35490945647788
+    },
+    {
+      "epoch": 27,
+      "train_mse_scaled": 0.03502177273252317,
+      "val_mae": 20.077620871401017
+    },
+    {
+      "epoch": 28,
+      "train_mse_scaled": 0.034732978651744885,
+      "val_mae": 18.830197781268073
+    },
+    {
+      "epoch": 29,
+      "train_mse_scaled": 0.03463473045336163,
+      "val_mae": 18.79937104390759
+    },
+    {
+      "epoch": 30,
+      "train_mse_scaled": 0.03437839298627759,
+      "val_mae": 19.62478478561891
+    },
+    {
+      "epoch": 31,
+      "train_mse_scaled": 0.03453072004658564,
+      "val_mae": 18.780591269663915
+    }
+  ]
+}

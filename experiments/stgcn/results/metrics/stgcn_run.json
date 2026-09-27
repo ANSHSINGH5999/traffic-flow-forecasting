@@ -1,0 +1,104 @@
+{
+  "mode": "final",
+  "timestamp": "2026-09-27T23:53:39.435494",
+  "seed": 42,
+  "device": "mps",
+  "python": "3.14.6",
+  "os": "Darwin 25.6.0 (arm64)",
+  "libraries": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0",
+    "matplotlib": "3.11.2",
+    "streamlit": "1.64.0",
+    "pyyaml": "6.0.3"
+  },
+  "graph": {
+    "source": "data/raw/pems04_distance.csv (distributed with pems04.npz by the ASTGCN authors)",
+    "edges": 340,
+    "nodes": 307,
+    "sigma_m": 257.5186550500138,
+    "weighting": "w = exp(-(d/sigma)^2), sigma = std of edge distances; symmetric; road edges only",
+    "laplacian": "scaled normalised Laplacian, Chebyshev polynomials",
+    "lambda_max": 2.000000000000002
+  },
+  "search": [
+    {
+      "params": {
+        "channels": [
+          32,
+          8,
+          32
+        ],
+        "cheb_k": 2
+      },
+      "val_mae": 20.1352
+    },
+    {
+      "params": {
+        "channels": [
+          32,
+          8,
+          32
+        ],
+        "cheb_k": 3
+      },
+      "val_mae": 20.2051
+    },
+    {
+      "params": {
+        "channels": [
+          64,
+          16,
+          64
+        ],
+        "cheb_k": 2
+      },
+      "val_mae": 19.8331
+    },
+    {
+      "params": {
+        "channels": [
+          64,
+          16,
+          64
+        ],
+        "cheb_k": 3
+      },
+      "val_mae": 20.0476
+    }
+  ],
+  "selected": {
+    "channels": [
+      64,
+      16,
+      64
+    ],
+    "cheb_k": 2
+  },
+  "fixed": {
+    "kt": 3,
+    "dropout": 0.0,
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "max_epochs": 50,
+    "patience": 8
+  },
+  "tuning_time_s": 2053.465131999925,
+  "val_metrics": {
+    "MAE": 18.779844158544623,
+    "RMSE": 29.652890598030034,
+    "MAPE": 10.857328992066218
+  },
+  "test_metrics": {
+    "MAE": 19.49380874633789,
+    "RMSE": 30.77320671081543,
+    "MAPE": 10.996848434395764
+  },
+  "training_time_s": 2399.228126000031,
+  "inference_time_s": 3.5433937499765307,
+  "parameters": 141825,
+  "total_runtime_s": 4463.890072625014
+}
