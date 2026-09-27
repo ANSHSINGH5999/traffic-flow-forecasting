@@ -106,6 +106,9 @@ def research_answer(t, reg, hy):
               if (sc > lvl_max).all() else
               f"sudden-change MAE exceeded the worst flow-regime MAE for {int((sc > lvl_max).sum())} of 6 models")
     lines.append(f"Error analysis: {worst_txt}; {sc_txt}.")
+    best = reg.loc[reg.groupby("Regime")["MAE"].idxmin()].set_index("Regime")
+    lines.append("Lowest MAE per regime: " + "; ".join(
+        f"{r}: {best.loc[r, 'Model']} ({best.loc[r, 'MAE']:.2f})" for r in ea.REGIME_ORDER) + ".")
     return lines
 
 
@@ -262,6 +265,7 @@ Figures: `fig5_training_time.png`, `fig6_inference_time.png`, `fig12_training_cu
 ## 10. Hybrid Model Analysis
 - {answer[3]}
 - {answer[4]}
+- By regime: {answer[6]}
 - Hybrid time breakdown (s): `{json.dumps({k: round(v, 1) for k, v in params[HYBRID]['time_breakdown_s'].items()})}`.
 
 ## 11. Research Findings
