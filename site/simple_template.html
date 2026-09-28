@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="The traffic forecasting project explained in the simplest words.">
+<title>Traffic Guessing Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f7fb;--card:#ffffff;--ink:#1c2433;--muted:#566175;--line:#d9e1ea;--road:#3a4150;--lane:#f2c230;--blue:#2f6fce;--good:#1f8a4c;--soft:#e8f0fa;
+  --ha:#848f8a;--rf:#2f8f4e;--xgb:#c99300;--lstm:#2f6fce;--gru:#7a4cc2;--hyb:#d0402e;--stg:#00838f;
+  --display:"Baloo 2","Trebuchet MS",sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#10151d;--card:#18202b;--ink:#e9eef5;--muted:#9aa7b8;--line:#2a3544;--road:#0b0f14;--soft:#1c2940;--blue:#6aa0f0;--good:#4cc27e;
+  --ha:#9aa4a0;--lstm:#5b92e6;--gru:#9b74dc;--hyb:#ea5f4c;--xgb:#dcaa22;--rf:#46a865;--stg:#2bb3c0}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#10151d;--card:#18202b;--ink:#e9eef5;--muted:#9aa7b8;--line:#2a3544;--road:#0b0f14;--soft:#1c2940;--blue:#6aa0f0;--good:#4cc27e;
+  --ha:#9aa4a0;--lstm:#5b92e6;--gru:#9b74dc;--hyb:#ea5f4c;--xgb:#dcaa22;--rf:#46a865;--stg:#2bb3c0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.6 var(--body)}
+.wrap{max-width:780px;margin:0 auto;padding-inline:18px;padding-block:0 80px}
+.road{height:34px;background:var(--road);margin-inline:-18px;position:relative;overflow:hidden}
+.road::after{content:"";position:absolute;left:0;right:0;top:15px;height:4px;
+  background:repeating-linear-gradient(90deg,var(--lane) 0 40px,transparent 40px 70px)}
+.car{position:absolute;top:6px;width:34px;height:20px;border-radius:6px 10px 4px 4px;z-index:1}
+@media (prefers-reduced-motion:no-preference){.car{animation:drive 9s linear infinite}}
+@keyframes drive{from{left:-40px}to{left:100%}}
+h1{font:800 clamp(34px,7vw,52px)/1.05 var(--display);margin:30px 0 10px;text-wrap:balance}
+h2{font:800 30px/1.15 var(--display);margin:0 0 8px;text-wrap:balance}
+h3{font:600 21px/1.2 var(--display);margin:0}
+p{margin:0 0 12px;max-width:62ch}
+.big{font-size:21px}
+.muted{color:var(--muted)}
+section{padding-block:36px 0;display:grid;gap:10px}
+.step{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;
+  background:var(--blue);color:#fff;font:800 18px/1 var(--display);margin-right:10px;vertical-align:middle}
+.box{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 18px}
+.facts{display:flex;flex-wrap:wrap;gap:12px}
+.fact{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 16px;flex:1 1 150px}
+.fact b{display:block;font:800 30px/1.1 var(--display)}
+.fact span{color:var(--muted);font-size:15px}
+.counts{display:flex;flex-wrap:wrap;gap:5px;align-items:end;margin-top:6px}
+.c{width:40px;text-align:center;font:700 13px/1 var(--body)}
+.c i{display:block;background:var(--blue);border-radius:6px 6px 2px 2px;margin-bottom:4px}
+.c.gap i{background:transparent;border:2px dashed var(--line)}
+.c.q i{background:var(--lane);display:flex;align-items:center;justify-content:center;font:800 22px var(--display);color:#1c2433}
+.split{display:flex;height:40px;border-radius:10px;overflow:hidden;font:700 15px/40px var(--body);color:#fff;text-align:center;margin-top:6px}
+.split div{white-space:nowrap;overflow:hidden}
+.players{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.player{background:var(--card);border:2px solid var(--line);border-left-width:8px;border-radius:14px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.player .nick{font:600 15px/1.2 var(--body);color:var(--muted)}
+.player p{font-size:16px;margin:0}
+.tag{display:inline-block;font:700 12px/1 var(--body);text-transform:uppercase;letter-spacing:.06em;background:var(--soft);color:var(--blue);
+  padding:4px 8px;border-radius:999px;margin-top:4px;justify-self:start}
+.race{display:grid;gap:8px}
+.lane{display:grid;grid-template-columns:170px 1fr 64px;gap:10px;align-items:center;font-size:16px}
+.lane .bar{height:22px;border-radius:0 11px 11px 0;background:var(--line)}
+.lane .bar i{display:block;height:100%;border-radius:0 11px 11px 0}
+.lane b{font:800 18px var(--display);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.lane{grid-template-columns:110px 1fr 54px;font-size:14px}}
+.learn{display:grid;gap:10px}
+.learn .box{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.learn .n{font:800 30px/1 var(--display);color:var(--blue)}
+.script{background:var(--soft);border-radius:14px;padding:18px 20px;font-size:19px}
+.script p{max-width:none}
+details{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 16px}
+details+details{margin-top:8px}
+summary{cursor:pointer;font:700 18px var(--body)}
+summary:focus-visible,a:focus-visible{outline:3px solid var(--lane);outline-offset:2px}
+details p{margin:8px 0 0}
+a{color:var(--blue)}
+footer{padding-top:40px;color:var(--muted);font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="road" aria-hidden="true">
+    <span class="car" style="background:var(--lane);animation-delay:0s"></span>
+    <span class="car" style="background:#e45b4b;animation-delay:-3s"></span>
+    <span class="car" style="background:#58a6ff;animation-delay:-6s"></span>
+  </div>
+
+  <h1>The Traffic Guessing Game</h1>
+  <p class="big">Our project teaches computers to guess <b>how many cars will pass a spot on the road 15 minutes from now.</b></p>
+  <p class="muted">A simple explanation of "An Enhanced Machine Learning Framework for Short-Term Traffic Flow Forecasting" by Ankit Bharatula and Ansh Singh, SRM Institute of Science and Technology.</p>
+
+  <section>
+    <h2><span class="step">1</span>Why guess traffic?</h2>
+    <p>If we know a road will be busy soon, traffic lights can change earlier and maps can send cars another way. That means less waiting in traffic jams.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span>Where do the numbers come from?</h2>
+    <p>California (USA) has little <b>car-counting machines</b> built into its big roads. Every 5 minutes, each machine writes down how many cars went past it.
+      We used a famous public dataset called <b>PeMSD4</b>.</p>
+    <div class="facts">
+      <div class="fact"><b>307</b><span>counting machines</span></div>
+      <div class="fact"><b>5 min</b><span>one new count every</span></div>
+      <div class="fact"><b>59 days</b><span>1 Jan – 28 Feb 2018</span></div>
+      <div class="fact"><b>{{counts_per_machine}}</b><span>counts per machine</span></div>
+    </div>
+    <p class="muted">Sometimes a machine broke and wrote "0". We treated those as "missing", not as "no cars". Only {{missing_pct}}% of counts were missing.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span>The game</h2>
+    <p>The computer sees the <b>last 12 counts</b> (the last 1 hour). It must guess the count <b>15 minutes later</b>, which is 3 counts ahead.</p>
+    <div class="box" aria-label="12 known counts, then two skipped steps, then the count to guess">
+      <div class="counts">
+        {{count_bars}}
+        <div class="c gap"><i style="height:40px"></i>+5</div>
+        <div class="c gap"><i style="height:40px"></i>+10</div>
+        <div class="c q"><i style="height:64px">?</i>+15</div>
+      </div>
+      <p class="muted" style="margin-top:10px">Blue = the last hour we know (real counts from machine 0). Yellow = the number the computer must guess.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span>Practice, mock test, final exam</h2>
+    <p>Like school, we cut the 59 days into three parts, <b>in time order</b>:</p>
+    <div class="split" role="img" aria-label="70 percent practice, 15 percent mock test, 15 percent final exam">
+      <div style="flex:70;background:var(--blue)">Practice 70%</div>
+      <div style="flex:15;background:var(--gru)">Mock 15%</div>
+      <div style="flex:15;background:var(--hyb)">Exam 15%</div>
+    </div>
+    <p><b>Practice</b> (first 41 days): the computer learns. <b>Mock test</b> (next 9 days): we pick each player's best settings.
+      <b>Final exam</b> (last 9 days): answers stay hidden and each player takes the exam <b>only once</b>.</p>
+    <div class="box">
+      <h3>The no-cheating rule</h3>
+      <p style="margin-top:6px">Nobody can peek at the future. When guessing, a player may only use counts it could really know by that time.
+        We even wrote a checking program (an "audit") that confirms nobody cheated.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">5</span>Meet the 7 players</h2>
+    <p>Seven different "guessers" played the same game on the same exam.</p>
+    <div class="players">
+      <div class="player" style="border-left-color:var(--ha)"><h3>Historical Average</h3><span class="nick">The calendar kid</span>
+        <p>Says: "On Mondays at 8 o'clock this road usually has this many cars." It doesn't look at today at all.</p></div>
+      <div class="player" style="border-left-color:var(--rf)"><h3>Random Forest</h3><span class="nick">A class that votes</span>
+        <p>100 simple "decision trees" each make a guess, and the answer is their average.</p></div>
+      <div class="player" style="border-left-color:var(--xgb)"><h3>XGBoost</h3><span class="nick">The mistake fixer</span>
+        <p>Trees learn one after another. Each new tree fixes the mistakes of the ones before it.</p></div>
+      <div class="player" style="border-left-color:var(--lstm)"><h3>LSTM</h3><span class="nick">The storyteller with a memory</span>
+        <p>A brain-like network that reads the 12 counts in order and remembers the important parts.</p></div>
+      <div class="player" style="border-left-color:var(--gru)"><h3>GRU</h3><span class="nick">LSTM's little sibling</span>
+        <p>Works like LSTM but is simpler inside.</p></div>
+      <div class="player" style="border-left-color:var(--hyb)"><h3>Hybrid LSTM-XGBoost</h3><span class="nick">The team-up (our idea)</span>
+        <p>LSTM reads the hour and writes "notes" (32 numbers). XGBoost reads those notes plus 19 simple clues and makes the final guess.</p>
+        <span class="tag">our proposed model</span></div>
+      <div class="player" style="border-left-color:var(--stg)"><h3>STGCN</h3><span class="nick">The neighbour watcher</span>
+        <p>Looks at the machine <b>and its neighbours on the road map</b>. Traffic from the next road reaches you soon.</p>
+        <span class="tag">extra 7th model</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">6</span>The race results</h2>
+    <p>Score = <b>how many cars off</b> the guess was, on average (called <b>MAE</b>). <b>Smaller is better</b>, like golf.
+      These are the real results from the final exam ({{test_samples}} guesses each).</p>
+    <div class="race">{{race}}</div>
+    <p class="muted">"Cars off" means cars per 5 minutes. Other scores (RMSE and MAPE) put the players in the same top-3 order: {{top3}}.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">7</span>What we learned</h2>
+    <div class="learn">
+      <div class="box"><span class="n">1</span><p>Every learning player beat the calendar kid. The best was about <b>{{best_vs_ha}}% better</b>.</p></div>
+      <div class="box"><span class="n">2</span><p>Our team-up (hybrid) beat XGBoost, but only by a <b>tiny bit ({{hyb_vs_xgb}}%)</b>, and it needed about <b>{{hyb_time}}× more time to learn</b>.
+        So it is a small win, not a big one.</p></div>
+      <div class="box"><span class="n">3</span><p>Looking at <b>neighbour roads</b> helped the most. STGCN was about <b>{{stg_vs_hyb}}% better</b> than our team-up, but it took the longest to learn
+        (about {{stg_time}}× XGBoost).</p></div>
+      <div class="box"><span class="n">4</span><p><b>Sudden changes are the hardest</b> for everyone. When traffic changed suddenly, the simple calendar kid made the smallest mistakes.
+        STGCN came second.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Say it in one minute</h2>
+    <div class="script">
+      <p>"Our project guesses how many cars will pass a road 15 minutes from now.</p>
+      <p>We used real counts from 307 car-counting machines in California, taken every 5 minutes for 59 days.</p>
+      <p>The computer looks at the last one hour and guesses 15 minutes ahead. We trained on the early days, chose settings on the middle days,
+        and tested once on the last 9 days, without peeking at the future.</p>
+      <p>We compared 7 guessers. Our idea joins an LSTM, which remembers patterns, with XGBoost, which fixes mistakes. It was a little better than
+        XGBoost but much slower. A graph model called STGCN, which also watches neighbouring roads, did best.</p>
+      <p>So: looking at the road network helps the most, and our hybrid gives only a small gain."</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Easy answers to hard questions</h2>
+    <div>
+      <details><summary>What does MAE mean?</summary><p>"Mean Absolute Error": on average, how many cars our guess was away from the real count. If we guess 100 and the real count is 110, we are 10 off.</p></details>
+      <details><summary>Why 15 minutes?</summary><p>It is short-term forecasting: close enough to be accurate, and early enough to change traffic lights or routes. 15 minutes = 3 counts of 5 minutes.</p></details>
+      <details><summary>How do you know you didn't cheat?</summary><p>Data is split by time, the final exam was used only once, settings were chosen on the mock test, and no guess uses a count from the future.
+        An audit program checks all of this and says PASS.</p></details>
+      <details><summary>Your own model isn't the best. Is that bad?</summary><p>No. Research must be honest. We report what really happened: our hybrid gave a small gain, and STGCN did better.
+        That is a useful finding.</p></details>
+      <details><summary>What are RMSE and MAPE?</summary><p>RMSE is like MAE, but punishes big mistakes more. MAPE is the mistake as a percentage of the real count. For all three, smaller is better.</p></details>
+      <details><summary>Can I see it working?</summary><p>Yes. The <a href="/">results website</a> shows real guesses from every player, and the Streamlit app makes a new 15-minute guess when you press a button.</p></details>
+    </div>
+  </section>
+
+  <footer>
+    All numbers on this page come from the project's result files. Full details: <a href="/">results website</a> ·
+    <a href="https://github.com/ANSHSINGH5999/traffic-flow-forecasting">code on GitHub</a>
+  </footer>
+</div>
+</body>
+</html>

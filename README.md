@@ -1,5 +1,6 @@
 # An Enhanced Machine Learning Framework for Short-Term Traffic Flow Forecasting
 
+- **Simple explanation (anyone can follow):** https://traffic-flow-forecasting.vercel.app/simple
 - **Live results site:** https://traffic-flow-forecasting.vercel.app (interactive explorer of the real test predictions, all seven models)
 - **Code, data & trained models:** https://github.com/ANSHSINGH5999/traffic-flow-forecasting
 - **Run the live-model demo:** `streamlit run app/app.py` locally, or deploy `app/app.py` on

@@ -85,9 +85,54 @@ def main():
         "stgcn": {"selected": stg["selected"], "parameters": stg["parameters"], "graph": stg["graph"]},
         "sensors": series,
     }
+    render_simple(c, pv, fr)
     html = (ROOT / "site" / "template.html").read_text().replace("__DATA__", json.dumps(data, separators=(",", ":")))
     (ROOT / "site" / "index.html").write_text(html)
     print(f"site/index.html {len(html) / 1e6:.2f} MB, models: {list(c.index)}")
+
+
+def render_simple(c, pv, fr):
+    """Kid-friendly page. Every number is computed here, and every sentence's claim is asserted against the data."""
+    ha, hy, xg, st = (c.loc[m] for m in ["Historical Average", "Hybrid LSTM-XGBoost", "XGBoost", "STGCN"])
+    learners = c.drop(index="Historical Average")
+    assert (learners["MAE"] < ha["MAE"]).all(), "claim: every learning player beat the calendar kid"
+    top3 = [list(c[k].sort_values().index[:3]) for k in ("MAE", "RMSE", "MAPE")]
+    assert top3[0] == top3[1] == top3[2], "claim: same top-3 order on all metrics"
+    sc = pv["sudden_change"].sort_values()
+    assert list(sc.index[:2]) == ["Historical Average", "STGCN"], "claim: calendar kid first, STGCN second in sudden changes"
+    assert hy["MAE"] < xg["MAE"] and st["MAE"] < hy["MAE"], "claim: hybrid beat XGBoost, STGCN beat hybrid"
+
+    # the real last hour of machine 0 before 2018-02-21 08:00 (the example used by scripts/test_inference.py)
+    flow = np.load(ROOT / "data" / "raw" / "pems04.npz")["data"][:, 0, 0]
+    origin = int((pd.Timestamp("2018-02-21 08:00") - pd.Timestamp("2018-01-01")) / pd.Timedelta(minutes=5))
+    hour = flow[origin - 11:origin + 1]
+    bars = "".join(f'<div class="c"><i style="height:{max(8, v / hour.max() * 90):.0f}px"></i>{v:.0f}</div>' for v in hour)
+
+    order = c["MAE"].sort_values()
+    worst = order.max()
+    css = {"Historical Average": "--ha", "Random Forest": "--rf", "XGBoost": "--xgb", "LSTM": "--lstm", "GRU": "--gru",
+           "Hybrid LSTM-XGBoost": "--hyb", "STGCN": "--stg"}
+    race = "".join(f'<div class="lane"><span>{m}</span><div class="bar"><i style="width:{v / worst * 100:.1f}%;background:var({css[m]})">'
+                   f'</i></div><b>{v:.1f}</b></div>' for m, v in order.items())
+    vals = {
+        "counts_per_machine": f"{fr['dataset']['time_steps']:,}",
+        "missing_pct": f"{fr['dataset']['zero_pct']:.1f}",
+        "count_bars": bars,
+        "test_samples": f"{fr['samples']['test']:,}",
+        "race": race,
+        "top3": ", ".join(top3[0]),
+        "best_vs_ha": f"{pct(c['MAE'].min(), ha['MAE']):.0f}",
+        "hyb_vs_xgb": f"{pct(hy['MAE'], xg['MAE']):.1f}",
+        "hyb_time": f"{hy['Training time (s)'] / xg['Training time (s)']:.0f}",
+        "stg_vs_hyb": f"{pct(st['MAE'], hy['MAE']):.0f}",
+        "stg_time": f"{st['Training time (s)'] / xg['Training time (s)']:.0f}",
+    }
+    html = (ROOT / "site" / "simple_template.html").read_text()
+    for k, v in vals.items():
+        html = html.replace("{{" + k + "}}", v)
+    assert "{{" not in html, "unfilled placeholder"
+    (ROOT / "site" / "simple.html").write_text(html)
+    print("site/simple.html", {k: v for k, v in vals.items() if k not in ("count_bars", "race")})
 
 
 if __name__ == "__main__":
